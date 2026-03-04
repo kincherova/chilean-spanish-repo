@@ -14,7 +14,13 @@ Deno.serve(async (req: Request) => {
   try {
     const { name, email } = await req.json();
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "re_3ToxNWbp_KDwgVmrvynSRPtUkzorPokEz";
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    if (!RESEND_API_KEY) {
+      return new Response(JSON.stringify({ error: "Email service not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
