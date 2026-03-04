@@ -3,13 +3,13 @@ const STATIC_ASSETS = [
   '/chilean-spanish-repo/',
   '/chilean-spanish-repo/index.html',
   '/chilean-spanish-repo/manifest.json',
-  '/chilean-spanish-repo/icon_192x192.png',
-  '/chilean-spanish-repo/icon_512x512.png',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(STATIC_ASSETS.map((url) => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
