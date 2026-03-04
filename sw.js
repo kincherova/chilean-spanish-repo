@@ -1,10 +1,10 @@
 const CACHE_NAME = 'chilean-spanish-v1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon_192x192.png',
-  '/icon_512x512.png',
+  '/chilean-spanish-repo/',
+  '/chilean-spanish-repo/index.html',
+  '/chilean-spanish-repo/manifest.json',
+  '/chilean-spanish-repo/icon_192x192.png',
+  '/chilean-spanish-repo/icon_512x512.png',
 ];
 
 self.addEventListener('install', (event) => {
