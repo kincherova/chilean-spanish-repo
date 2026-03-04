@@ -1,23 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { Globe, BookOpen, Clock, Award, BookMarked, Settings, ChevronDown } from 'lucide-react';
+import { Globe, BookOpen, Clock, Award, BookMarked } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useState, useRef, useEffect } from 'react';
 
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [adminOpen, setAdminOpen] = useState(false);
-  const adminRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (adminRef.current && !adminRef.current.contains(e.target as Node)) {
-        setAdminOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <div className="min-h-screen">
@@ -31,44 +18,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             {user && (
-              <>
-                <button
-                  onClick={() => navigate('/phrase-book')}
-                  className="flex items-center gap-2 text-sm font-medium text-teal hover:text-teal/80 transition-colors"
-                >
-                  <BookMarked className="w-5 h-5" />
-                  <span className="hidden sm:inline">Phrase Book</span>
-                </button>
-                <div className="relative" ref={adminRef}>
-                  <button
-                    onClick={() => setAdminOpen(!adminOpen)}
-                    className="flex items-center gap-2 text-sm font-medium text-charcoal hover:text-coral transition-colors"
-                  >
-                    <Settings className="w-5 h-5" />
-                    <span className="hidden sm:inline">Admin</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${adminOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {adminOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-card shadow-lg border border-gray-100 py-1 z-50">
-                      {[
-                        { label: 'Flashcards', path: '/admin/flashcards' },
-                        { label: 'Audio', path: '/admin/audio' },
-                        { label: 'Hear and React', path: '/admin/hear-and-react' },
-                        { label: 'This or That', path: '/admin/this-or-that' },
-                        { label: 'Dialogues', path: '/admin/dialogue' },
-                      ].map(item => (
-                        <button
-                          key={item.path}
-                          onClick={() => { setAdminOpen(false); navigate(item.path); }}
-                          className="w-full text-left px-4 py-2 text-sm text-charcoal hover:bg-cream hover:text-coral transition-colors"
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </>
+              <button
+                onClick={() => navigate('/phrase-book')}
+                className="flex items-center gap-2 text-sm font-medium text-teal hover:text-teal/80 transition-colors"
+              >
+                <BookMarked className="w-5 h-5" />
+                <span className="hidden sm:inline">Phrase Book</span>
+              </button>
             )}
             <button
               onClick={() => navigate(user ? '/modules' : '/auth')}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Globe, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ export default function Auth() {
     try {
       if (isSignUp) {
         await signUp(formData.email, formData.password, formData.name);
+        supabase.functions.invoke('notify-signup', {
+          body: { name: formData.name, email: formData.email },
+        });
         navigate('/onboarding');
       } else {
         await signIn(formData.email, formData.password);
