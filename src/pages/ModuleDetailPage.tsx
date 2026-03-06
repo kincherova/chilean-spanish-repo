@@ -117,11 +117,10 @@ export default function ModuleDetailPage() {
 
   return (
     <div className="min-h-screen bg-warm-bg">
-      <NavBar back="/modules" title={module.title} />
+      <NavBar back="/modules" />
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <div className="text-3xl mb-3">{module.icon === 'book' ? '📖' : module.icon}</div>
             <h1 className="font-display text-3xl font-bold text-navy mb-2">{module.title}</h1>
             <p className={`text-muted ${fs.body(fontSize)}`}>{module.description}</p>
           </div>
