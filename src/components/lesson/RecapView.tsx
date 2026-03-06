@@ -1,14 +1,16 @@
 import { CheckCircle2, Star } from 'lucide-react';
 import { RecapPage } from '../../types/database';
+import { FontSize } from './fontSizeClasses';
 import DialogueView from './DialogueView';
 
 interface Props {
   page: RecapPage;
   lessonTitle: string;
   isComplete: boolean;
+  fontSize: FontSize;
 }
 
-export default function RecapView({ page, lessonTitle, isComplete }: Props) {
+export default function RecapView({ page, lessonTitle, isComplete, fontSize }: Props) {
   if (page.dialogue && page.dialogue.length > 0) {
     return (
       <div>
@@ -21,7 +23,7 @@ export default function RecapView({ page, lessonTitle, isComplete }: Props) {
             <p className="text-muted text-sm">Review the conversation</p>
           </div>
         </div>
-        <DialogueView page={{ type: 'dialogue', title: '', dialogue: page.dialogue }} />
+        <DialogueView page={{ type: 'dialogue', title: '', dialogue: page.dialogue }} fontSize={fontSize} />
       </div>
     );
   }

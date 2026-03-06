@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Flashcard } from '../../types/database';
+import { FontSize, fs } from './fontSizeClasses';
 
 interface Props {
   flashcards: Flashcard[];
   unitId: string;
+  fontSize: FontSize;
 }
 
-export default function FlashcardsView({ flashcards }: Props) {
+export default function FlashcardsView({ flashcards, fontSize }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -28,7 +30,7 @@ export default function FlashcardsView({ flashcards }: Props) {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold text-navy mb-6">Test Your Memory</h1>
+      <h1 className={`font-display font-bold text-navy mb-6 ${fs.heading(fontSize)}`}>Test Your Memory</h1>
 
       <div className="flex items-center justify-between mb-3 text-xs text-muted">
         <span>{currentIndex + 1} / {flashcards.length}</span>
@@ -59,8 +61,8 @@ export default function FlashcardsView({ flashcards }: Props) {
             className="absolute inset-0 bg-white rounded-card-lg shadow-sm flex flex-col items-center justify-center p-8"
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <p className="text-xs text-muted uppercase tracking-wider mb-4">Spanish</p>
-            <p className="font-display text-2xl font-bold text-navy text-center">{card?.spanish_text}</p>
+            <p className={`text-muted uppercase tracking-wider mb-4 ${fs.label(fontSize)}`}>Spanish</p>
+            <p className={`font-display font-bold text-navy text-center ${fs.heading(fontSize)}`}>{card?.spanish_text}</p>
             {card?.audio_url && (
               <button
                 onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
@@ -69,14 +71,14 @@ export default function FlashcardsView({ flashcards }: Props) {
                 <Volume2 size={16} />
               </button>
             )}
-            <p className="text-muted text-xs mt-3">Tap to reveal</p>
+            <p className={`text-muted mt-3 ${fs.label(fontSize)}`}>Tap to reveal</p>
           </div>
           <div
             className="absolute inset-0 bg-navy rounded-card-lg shadow-sm flex flex-col items-center justify-center p-8"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
-            <p className="text-xs text-white/50 uppercase tracking-wider mb-4">English</p>
-            <p className="font-display text-xl font-bold text-white text-center">{card?.english_text}</p>
+            <p className={`text-white/50 uppercase tracking-wider mb-4 ${fs.label(fontSize)}`}>English</p>
+            <p className={`font-display font-bold text-white text-center ${fs.heading(fontSize)}`}>{card?.english_text}</p>
           </div>
         </div>
       </button>

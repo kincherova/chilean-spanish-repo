@@ -1,10 +1,16 @@
 import { DialoguePage } from '../../types/database';
+import { FontSize, fs } from './fontSizeClasses';
 
-export default function DialogueView({ page }: { page: DialoguePage }) {
+interface Props {
+  page: DialoguePage;
+  fontSize: FontSize;
+}
+
+export default function DialogueView({ page, fontSize }: Props) {
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold text-navy mb-1">{page.title}</h1>
-      {page.subtitle && <p className="text-muted text-sm mb-5">{page.subtitle}</p>}
+      <h1 className={`font-display font-bold text-navy mb-1 ${fs.heading(fontSize)}`}>{page.title}</h1>
+      {page.subtitle && <p className={`text-muted mb-5 ${fs.bodySmall(fontSize)}`}>{page.subtitle}</p>}
 
       <div className="space-y-3">
         {page.dialogue?.map((line, i) => {
@@ -20,13 +26,13 @@ export default function DialogueView({ page }: { page: DialoguePage }) {
                 'bg-coral/15 text-navy'
               }`}>
                 {line.name && (
-                  <p className={`text-xs font-semibold mb-1 ${isLocal ? 'text-white/60' : isWaiter ? 'text-teal' : 'text-coral'}`}>
+                  <p className={`font-semibold mb-1 ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : isWaiter ? 'text-teal' : 'text-coral'}`}>
                     {line.name}
                   </p>
                 )}
-                <p className={`text-sm font-medium ${isLocal ? 'text-white' : 'text-navy'}`}>{line.spanish}</p>
+                <p className={`font-medium ${fs.body(fontSize)} ${isLocal ? 'text-white' : 'text-navy'}`}>{line.spanish}</p>
                 {line.english && (
-                  <p className={`text-xs mt-1 italic ${isLocal ? 'text-white/60' : 'text-muted'}`}>{line.english}</p>
+                  <p className={`mt-1 italic ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : 'text-muted'}`}>{line.english}</p>
                 )}
               </div>
             </div>

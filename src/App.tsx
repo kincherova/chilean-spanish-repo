@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProgressProvider } from './contexts/ProgressContext';
+import { FontSizeProvider } from './contexts/FontSizeContext';
 import HomePage from './pages/HomePage';
 import ModulesPage from './pages/ModulesPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
@@ -16,17 +17,19 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ProgressProvider>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/modules" element={<ProtectedRoute><ModulesPage /></ProtectedRoute>} />
-            <Route path="/modules/:moduleId" element={<ProtectedRoute><ModuleDetailPage /></ProtectedRoute>} />
-            <Route path="/modules/:moduleId/units/:unitId" element={<ProtectedRoute><UnitDetailPage /></ProtectedRoute>} />
-            <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-            <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <FontSizeProvider>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/modules" element={<ProtectedRoute><ModulesPage /></ProtectedRoute>} />
+              <Route path="/modules/:moduleId" element={<ProtectedRoute><ModuleDetailPage /></ProtectedRoute>} />
+              <Route path="/modules/:moduleId/units/:unitId" element={<ProtectedRoute><UnitDetailPage /></ProtectedRoute>} />
+              <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+              <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </FontSizeProvider>
         </ProgressProvider>
       </AuthProvider>
     </BrowserRouter>

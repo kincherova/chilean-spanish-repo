@@ -4,6 +4,7 @@ import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Lesson, Flashcard, LessonPage as LessonPageType } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import OverviewPageView from '../components/lesson/OverviewPageView';
 import IntroPageView from '../components/lesson/IntroPageView';
 import MultipleChoiceView from '../components/lesson/MultipleChoiceView';
@@ -12,10 +13,17 @@ import FlashcardsView from '../components/lesson/FlashcardsView';
 import DialogueView from '../components/lesson/DialogueView';
 import RecapView from '../components/lesson/RecapView';
 
+const FONT_SIZE_LABELS: Record<string, string> = {
+  normal: 'A',
+  large: 'A+',
+  xlarge: 'A++',
+};
+
 export default function LessonPage() {
   const { moduleId, unitId, lessonId } = useParams<{ moduleId: string; unitId: string; lessonId: string }>();
   const navigate = useNavigate();
   const { markLessonComplete, isLessonComplete } = useProgress();
+  const { fontSize, cycleFontSize } = useFontSize();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
@@ -96,6 +104,17 @@ export default function LessonPage() {
               style={{ width: `${progress}%` }}
             />
           </div>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white/60'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
           <button onClick={handleClose} className="p-1.5 rounded-lg text-muted hover:text-navy hover:bg-white/60 transition-colors">
             <X size={18} />
           </button>
@@ -105,25 +124,25 @@ export default function LessonPage() {
       <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 flex flex-col">
         <div className="flex-1">
           {page?.type === 'overview' && (
-            <OverviewPageView page={page} />
+            <OverviewPageView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'intro' && (
-            <IntroPageView page={page} />
+            <IntroPageView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'multiple_choice' && (
-            <MultipleChoiceView page={page} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
+            <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
           )}
           {page?.type === 'audio_choice' && (
-            <AudioChoiceView page={page} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
+            <AudioChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
           )}
           {page?.type === 'flashcards' && (
-            <FlashcardsView flashcards={flashcards} unitId={unitId!} />
+            <FlashcardsView flashcards={flashcards} unitId={unitId!} fontSize={fontSize} />
           )}
           {page?.type === 'dialogue' && (
-            <DialogueView page={page} />
+            <DialogueView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'recap' && (
-            <RecapView page={page} lessonTitle={lesson.title} isComplete={isLessonComplete(lesson.id)} />
+            <RecapView page={page} lessonTitle={lesson.title} isComplete={isLessonComplete(lesson.id)} fontSize={fontSize} />
           )}
         </div>
 

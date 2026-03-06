@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Volume2, CheckCircle2, XCircle, ChevronRight, Play } from 'lucide-react';
 import { AudioChoicePage } from '../../types/database';
+import { FontSize, fs } from './fontSizeClasses';
 
 interface Props {
   page: AudioChoicePage;
+  fontSize: FontSize;
   onCorrect: () => void;
   onWrong: () => void;
 }
 
-export default function AudioChoiceView({ page, onCorrect, onWrong }: Props) {
+export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong }: Props) {
   const [currentItem, setCurrentItem] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
@@ -59,8 +61,8 @@ export default function AudioChoiceView({ page, onCorrect, onWrong }: Props) {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-bold text-navy mb-1">{page.title}</h1>
-      <p className="text-muted text-sm mb-6">{currentItem + 1} / {page.items.length}</p>
+      <h1 className={`font-display font-bold text-navy mb-1 ${fs.heading(fontSize)}`}>{page.title}</h1>
+      <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
       <div className="flex flex-col items-center py-8 mb-6">
         <button
@@ -75,7 +77,7 @@ export default function AudioChoiceView({ page, onCorrect, onWrong }: Props) {
             <Play size={30} className="text-white ml-1" />
           )}
         </button>
-        <p className="text-muted text-sm mt-3">{item.question}</p>
+        <p className={`text-muted mt-3 ${fs.bodySmall(fontSize)}`}>{item.question}</p>
       </div>
 
       <div className="space-y-2 mb-5">
@@ -93,7 +95,7 @@ export default function AudioChoiceView({ page, onCorrect, onWrong }: Props) {
               disabled={answered}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-card border-2 text-left transition-all ${cls}`}
             >
-              <span className="font-medium text-navy text-sm">{opt}</span>
+              <span className={`font-medium text-navy ${fs.bodySmall(fontSize)}`}>{opt}</span>
               {answered && idx === item.correctAnswer && <CheckCircle2 size={16} className="text-green-500" />}
               {answered && idx === selected && idx !== item.correctAnswer && <XCircle size={16} className="text-red-400" />}
             </button>
