@@ -10,6 +10,7 @@ import LessonPage from './pages/LessonPage';
 import FlashcardsPage from './pages/FlashcardsPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
+import VocabularyPage from './pages/VocabularyPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
               <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/vocabulary" element={<ProtectedRoute><VocabularyPage /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </FontSizeProvider>

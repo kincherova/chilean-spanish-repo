@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, BookOpen, CheckCircle2, Award } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,6 +12,8 @@ export default function ProfilePage() {
   const { completedLessons } = useProgress();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [practiceCount, setPracticeCount] = useState(0);
+  const [masteredCount, setMasteredCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -21,6 +23,16 @@ export default function ProfilePage() {
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => { if (data) setProfile(data); });
+
+    supabase
+      .from('user_flashcard_tags')
+      .select('tag')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (!data) return;
+        setPracticeCount(data.filter((r) => r.tag === 'needs_practice').length);
+        setMasteredCount(data.filter((r) => r.tag === 'mastered').length);
+      });
   }, [user]);
 
   const handleSignOut = async () => {
@@ -56,6 +68,26 @@ export default function ProfilePage() {
               <p className="text-muted text-xs">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white rounded-card-lg overflow-hidden mb-4">
+          <Link
+            to="/vocabulary"
+            className="w-full flex items-center justify-between px-5 py-4 hover:bg-warm-bg transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <BookOpen size={16} className="text-muted" />
+              <div>
+                <span className="font-medium text-sm text-navy">My Vocabulary</span>
+                <p className="text-xs text-muted mt-0.5">
+                  {practiceCount > 0 || masteredCount > 0
+                    ? `${practiceCount} to practice · ${masteredCount} mastered`
+                    : 'No tagged words yet'}
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-muted group-hover:text-coral transition-colors" />
+          </Link>
         </div>
 
         <div className="bg-white rounded-card-lg overflow-hidden">
