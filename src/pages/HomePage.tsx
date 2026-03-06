@@ -7,8 +7,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-navy text-white">
-      <nav className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-        <span className="text-white font-display font-bold text-2xl">Survival Chilean Spanish</span>
+      <nav className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-end">
         <div className="flex items-center gap-4">
           {user ? (
             <Link
@@ -34,7 +33,7 @@ export default function HomePage() {
       </nav>
 
       <section className="max-w-3xl mx-auto px-6 pt-16 pb-20 text-center">
-        <div className="inline-flex items-center gap-2 bg-coral/20 border border-coral/30 rounded-full px-4 py-1.5 mb-8">
+        <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-1.5 mb-8">
           <Plane size={14} className="text-white" />
           <span className="text-white text-sm font-medium">Learn before you land</span>
         </div>
