@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Flashcard, UserFlashcardTag } from '../types/database';
@@ -12,6 +13,7 @@ const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 export default function PracticeFlashcardsPage() {
   const { user } = useAuth();
   const { fontSize, cycleFontSize } = useFontSize();
+  const navigate = useNavigate();
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [tags, setTags] = useState<Record<string, UserFlashcardTag['tag']>>({});
@@ -193,6 +195,18 @@ export default function PracticeFlashcardsPage() {
             </button>
           ))}
         </div>
+
+        {currentIndex === flashcards.length - 1 && (
+          <div className="mb-3">
+            <button
+              onClick={() => navigate('/modules')}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-navy hover:bg-navy/90 text-white font-semibold rounded-card-lg transition-colors"
+            >
+              <BookOpen size={17} />
+              Back to lessons
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-3">
           <button
