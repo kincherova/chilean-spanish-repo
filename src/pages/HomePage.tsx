@@ -9,25 +9,13 @@ export default function HomePage() {
     <div className="min-h-screen bg-navy text-white">
       <nav className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-end">
         <div className="flex items-center gap-4">
-          {user ? (
+          {user && (
             <Link
               to="/modules"
               className="bg-coral hover:bg-coral-dark text-white font-semibold px-5 py-2 rounded-full text-sm transition-colors"
             >
               Continue learning
             </Link>
-          ) : (
-            <>
-              <Link to="/login" className="text-white/70 hover:text-white text-sm transition-colors">
-                Sign in
-              </Link>
-              <Link
-                to="/login"
-                className="bg-coral hover:bg-coral-dark text-white font-semibold px-5 py-2 rounded-full text-sm transition-colors"
-              >
-                Get started
-              </Link>
-            </>
           )}
         </div>
       </nav>
