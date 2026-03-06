@@ -5,6 +5,9 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
+import { useFontSize } from '../contexts/FontSizeContext';
+
+const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
 interface UnitWithProgress extends Unit {
   lessons: Lesson[];
@@ -17,6 +20,7 @@ export default function ModuleDetailPage() {
   const [units, setUnits] = useState<UnitWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const { completedLessons } = useProgress();
+  const { fontSize, cycleFontSize } = useFontSize();
 
   useEffect(() => {
     async function load() {
@@ -114,10 +118,23 @@ export default function ModuleDetailPage() {
     <div className="min-h-screen bg-warm-bg">
       <NavBar back="/modules" title={module.title} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="text-3xl mb-3">{module.icon === 'book' ? '📖' : module.icon}</div>
-          <h1 className="font-display text-3xl font-bold text-navy mb-2">{module.title}</h1>
-          <p className="text-muted">{module.description}</p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-3xl mb-3">{module.icon === 'book' ? '📖' : module.icon}</div>
+            <h1 className="font-display text-3xl font-bold text-navy mb-2">{module.title}</h1>
+            <p className="text-muted">{module.description}</p>
+          </div>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border mt-1 flex-shrink-0 ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
         </div>
 
         {vocabUnits.length > 0 && (

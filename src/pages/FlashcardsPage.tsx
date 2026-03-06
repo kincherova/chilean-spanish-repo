@@ -5,10 +5,14 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
+import { useFontSize } from '../contexts/FontSizeContext';
+
+const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
 export default function FlashcardsPage() {
   const { moduleId, unitId } = useParams<{ moduleId: string; unitId: string }>();
   const { user } = useAuth();
+  const { fontSize, cycleFontSize } = useFontSize();
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [tags, setTags] = useState<Record<string, UserFlashcardTag['tag']>>({});
@@ -105,6 +109,17 @@ export default function FlashcardsPage() {
       <div className="max-w-sm mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 text-sm text-muted">
           <span>{currentIndex + 1} / {flashcards.length}</span>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border flex-shrink-0 ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
           <div className="flex gap-1">
             {flashcards.map((_, i) => (
               <button

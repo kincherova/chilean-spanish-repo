@@ -5,6 +5,9 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Unit, Lesson, Module } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
+import { useFontSize } from '../contexts/FontSizeContext';
+
+const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
 export default function UnitDetailPage() {
   const { moduleId, unitId } = useParams<{ moduleId: string; unitId: string }>();
@@ -13,6 +16,7 @@ export default function UnitDetailPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const { isLessonComplete } = useProgress();
+  const { fontSize, cycleFontSize } = useFontSize();
 
   useEffect(() => {
     async function load() {
@@ -53,10 +57,23 @@ export default function UnitDetailPage() {
     <div className="min-h-screen bg-warm-bg">
       <NavBar back={`/modules/${moduleId}`} title={unit.title} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <p className="text-xs text-muted font-medium mb-1 uppercase tracking-wider">{module.title}</p>
-          <h1 className="font-display text-2xl font-bold text-navy mb-2">{unit.title}</h1>
-          <p className="text-muted text-sm leading-relaxed">{unit.description}</p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs text-muted font-medium mb-1 uppercase tracking-wider">{module.title}</p>
+            <h1 className="font-display text-2xl font-bold text-navy mb-2">{unit.title}</h1>
+            <p className="text-muted text-sm leading-relaxed">{unit.description}</p>
+          </div>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border mt-1 flex-shrink-0 ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
         </div>
 
         <div className="space-y-3">

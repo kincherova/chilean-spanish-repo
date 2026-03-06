@@ -3,7 +3,10 @@ import { Volume2, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { Flashcard } from '../types/database';
+
+const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
 type Tag = 'needs_practice' | 'mastered';
 
@@ -28,6 +31,7 @@ const TABS: { key: Tag; label: string; color: string; activeClass: string }[] = 
 
 export default function VocabularyPage() {
   const { user } = useAuth();
+  const { fontSize, cycleFontSize } = useFontSize();
   const [cards, setCards] = useState<TaggedCard[]>([]);
   const [tab, setTab] = useState<Tag>('needs_practice');
   const [loading, setLoading] = useState(true);
@@ -97,7 +101,8 @@ export default function VocabularyPage() {
       <NavBar back="/profile" title="My Vocabulary" />
       <div className="max-w-2xl mx-auto px-4 py-8">
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-2">
           {TABS.map((t) => {
             const count = cards.filter((c) => c.tag === t.key).length;
             return (
@@ -119,6 +124,18 @@ export default function VocabularyPage() {
               </button>
             );
           })}
+          </div>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border flex-shrink-0 ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
         </div>
 
         {loading ? (
