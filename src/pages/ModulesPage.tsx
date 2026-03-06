@@ -5,6 +5,14 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
+import { useFontSize } from '../contexts/FontSizeContext';
+import { fs } from '../components/lesson/fontSizeClasses';
+
+const FONT_SIZE_LABELS: Record<string, string> = {
+  normal: 'A',
+  large: 'A+',
+  xlarge: 'A++',
+};
 
 interface ModuleWithStats extends Module {
   unitCount: number;
@@ -17,6 +25,7 @@ export default function ModulesPage() {
   const [modules, setModules] = useState<ModuleWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const { completedLessons } = useProgress();
+  const { fontSize, cycleFontSize } = useFontSize();
 
   useEffect(() => {
     async function load() {
@@ -63,9 +72,22 @@ export default function ModulesPage() {
     <div className="min-h-screen bg-warm-bg">
       <NavBar />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold text-navy mb-2">Your lessons</h1>
-          <p className="text-muted">Pick up where you left off or start something new.</p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-navy mb-2">Your lessons</h1>
+            <p className="text-muted">Pick up where you left off or start something new.</p>
+          </div>
+          <button
+            onClick={cycleFontSize}
+            title="Cycle text size"
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border mt-1 flex-shrink-0 ${
+              fontSize === 'normal'
+                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white'
+                : 'text-coral border-coral/40 bg-coral/10'
+            }`}
+          >
+            {FONT_SIZE_LABELS[fontSize]}
+          </button>
         </div>
 
         {loading ? (
@@ -96,14 +118,14 @@ export default function ModulesPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-muted font-medium">Module {idx + 1}</span>
+                          <span className={`text-muted font-medium ${fs.label(fontSize)}`}>Module {idx + 1}</span>
                           {isComplete && <CheckCircle2 size={14} className="text-green-500" />}
                         </div>
-                        <h2 className="font-semibold text-navy text-base leading-snug mb-1 truncate">
+                        <h2 className={`font-semibold text-navy leading-snug mb-1 truncate ${fs.body(fontSize)}`}>
                           {mod.title}
                         </h2>
-                        <p className="text-muted text-sm leading-relaxed line-clamp-2">{mod.description}</p>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-muted">
+                        <p className={`text-muted leading-relaxed line-clamp-2 ${fs.bodySmall(fontSize)}`}>{mod.description}</p>
+                        <div className={`flex items-center gap-3 mt-2 text-muted ${fs.label(fontSize)}`}>
                           <span>{mod.unitCount} units</span>
                           <span>·</span>
                           <Clock size={12} />
