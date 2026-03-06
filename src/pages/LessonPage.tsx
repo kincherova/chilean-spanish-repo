@@ -130,7 +130,7 @@ export default function LessonPage() {
             <IntroPageView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'multiple_choice' && (
-            <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
+            <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
           )}
           {page?.type === 'audio_choice' && (
             <AudioChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
