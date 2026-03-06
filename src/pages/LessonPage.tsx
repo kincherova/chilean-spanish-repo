@@ -133,7 +133,7 @@ export default function LessonPage() {
             <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
           )}
           {page?.type === 'audio_choice' && (
-            <AudioChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} />
+            <AudioChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
           )}
           {page?.type === 'flashcards' && (
             <FlashcardsView flashcards={flashcards} unitId={unitId!} fontSize={fontSize} />
