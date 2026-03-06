@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Library, User, ChevronLeft, List } from 'lucide-react';
+import { BookOpen, User, ChevronLeft, List } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavBarProps {
@@ -38,7 +38,7 @@ export default function NavBar({ back, title }: NavBarProps) {
               className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               title="My Vocabulary"
             >
-              <Library size={18} />
+              <BookOpen size={18} />
             </Link>
           )}
           {!isModules && (
