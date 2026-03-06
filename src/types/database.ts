@@ -75,6 +75,7 @@ export type LessonPage =
   | AudioChoicePage
   | FlashcardsPage
   | DialoguePage
+  | DialoguePracticePage
   | RecapPage;
 
 export interface OverviewPage {
@@ -144,6 +145,13 @@ export interface DialogueLine {
   english?: string;
   speaker: string;
   name?: string;
+}
+
+export interface DialoguePracticePage {
+  type: 'dialogue_practice';
+  title: string;
+  subtitle?: string;
+  dialogue: DialogueLine[];
 }
 
 export interface RecapPage {

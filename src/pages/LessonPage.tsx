@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Lesson, Flashcard, LessonPage as LessonPageType } from '../types/database';
+import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import OverviewPageView from '../components/lesson/OverviewPageView';
@@ -11,6 +11,7 @@ import MultipleChoiceView from '../components/lesson/MultipleChoiceView';
 import AudioChoiceView from '../components/lesson/AudioChoiceView';
 import FlashcardsView from '../components/lesson/FlashcardsView';
 import DialogueView from '../components/lesson/DialogueView';
+import DialoguePracticeView from '../components/lesson/DialoguePracticeView';
 import RecapView from '../components/lesson/RecapView';
 
 const FONT_SIZE_LABELS: Record<string, string> = {
@@ -54,7 +55,20 @@ export default function LessonPage() {
     );
   }
 
-  const pages = lesson.content?.pages ?? [];
+  const rawPages = lesson.content?.pages ?? [];
+  const pages: LessonPageType[] = rawPages.reduce<LessonPageType[]>((acc, p) => {
+    acc.push(p);
+    if (p.type === 'dialogue') {
+      const practice: DialoguePracticePage = {
+        type: 'dialogue_practice',
+        title: 'Your Turn',
+        subtitle: 'Tap each hidden reply to reveal what you could say.',
+        dialogue: p.dialogue,
+      };
+      acc.push(practice);
+    }
+    return acc;
+  }, []);
   const totalPages = pages.length;
   const page = pages[currentPage] as LessonPageType | undefined;
   const progress = totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0;
@@ -140,6 +154,9 @@ export default function LessonPage() {
           )}
           {page?.type === 'dialogue' && (
             <DialogueView page={page} fontSize={fontSize} />
+          )}
+          {page?.type === 'dialogue_practice' && (
+            <DialoguePracticeView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'recap' && (
             <RecapView page={page} lessonTitle={lesson.title} isComplete={isLessonComplete(lesson.id)} fontSize={fontSize} />
