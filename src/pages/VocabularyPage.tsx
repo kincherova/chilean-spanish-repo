@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Volume2, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Volume2, BookOpen, Zap } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,6 +34,7 @@ const TABS: { key: Tag; label: string; color: string; activeClass: string }[] = 
 export default function VocabularyPage() {
   const { user } = useAuth();
   const { fontSize, cycleFontSize } = useFontSize();
+  const navigate = useNavigate();
   const [cards, setCards] = useState<TaggedCard[]>([]);
   const [tab, setTab] = useState<Tag>('needs_practice');
   const [loading, setLoading] = useState(true);
@@ -161,36 +163,49 @@ export default function VocabularyPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {visible.map((card) => (
-              <div
-                key={card.id}
-                className="bg-white rounded-card-lg px-4 py-3.5 flex items-center justify-between gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className={`font-semibold text-navy leading-snug ${fs.body(fontSize)}`}>{card.spanish_text}</p>
-                  <p className={`text-muted mt-0.5 ${fs.bodySmall(fontSize)}`}>{card.english_text}</p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {card.audio_url && (
+          <>
+            <div className="space-y-2">
+              {visible.map((card) => (
+                <div
+                  key={card.id}
+                  className="bg-white rounded-card-lg px-4 py-3.5 flex items-center justify-between gap-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-semibold text-navy leading-snug ${fs.body(fontSize)}`}>{card.spanish_text}</p>
+                    <p className={`text-muted mt-0.5 ${fs.bodySmall(fontSize)}`}>{card.english_text}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {card.audio_url && (
+                      <button
+                        onClick={() => playAudio(card.audio_url!)}
+                        className="p-1.5 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                      >
+                        <Volume2 size={14} />
+                      </button>
+                    )}
                     <button
-                      onClick={() => playAudio(card.audio_url!)}
-                      className="p-1.5 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                      onClick={() => removeTag(card.id)}
+                      className="text-xs text-muted hover:text-coral transition-colors px-2 py-1 rounded hover:bg-coral/5"
+                      title="Remove tag"
                     >
-                      <Volume2 size={14} />
+                      Remove
                     </button>
-                  )}
-                  <button
-                    onClick={() => removeTag(card.id)}
-                    className="text-xs text-muted hover:text-coral transition-colors px-2 py-1 rounded hover:bg-coral/5"
-                    title="Remove tag"
-                  >
-                    Remove
-                  </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+            {tab === 'needs_practice' && (
+              <div className="mt-6">
+                <button
+                  onClick={() => navigate('/vocabulary/practice')}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-amber-400 hover:bg-amber-500 text-white font-semibold rounded-card-lg transition-colors shadow-sm"
+                >
+                  <Zap size={17} />
+                  Let's practice them
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>
