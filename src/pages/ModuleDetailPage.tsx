@@ -108,7 +108,7 @@ export default function ModuleDetailPage() {
         </div>
         {pct > 0 && (
           <div className="mt-3 bg-warm-bg rounded-full h-1 overflow-hidden">
-            <div className="h-full bg-coral rounded-full transition-all" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
           </div>
         )}
       </Link>

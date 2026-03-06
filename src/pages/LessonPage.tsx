@@ -100,7 +100,7 @@ export default function LessonPage() {
           )}
           <div className="flex-1 bg-white/60 rounded-full h-2 overflow-hidden">
             <div
-              className="h-full bg-coral rounded-full transition-all duration-300"
+              className="h-full bg-green-500 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
