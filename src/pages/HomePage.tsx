@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-navy text-white">
       <nav className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-        <span className="text-coral font-display font-bold text-2xl">CS</span>
+        <span className="text-white font-display font-bold text-2xl">Survival Chilean Spanish</span>
         <div className="flex items-center gap-4">
           {user ? (
             <Link
@@ -35,8 +35,8 @@ export default function HomePage() {
 
       <section className="max-w-3xl mx-auto px-6 pt-16 pb-20 text-center">
         <div className="inline-flex items-center gap-2 bg-coral/20 border border-coral/30 rounded-full px-4 py-1.5 mb-8">
-          <Plane size={14} className="text-coral" />
-          <span className="text-coral text-sm font-medium">Learn before you land</span>
+          <Plane size={14} className="text-white" />
+          <span className="text-white text-sm font-medium">Learn before you land</span>
         </div>
 
         <h1 className="font-display text-5xl sm:text-6xl font-bold leading-tight mb-6">
@@ -72,7 +72,7 @@ export default function HomePage() {
             },
             {
               icon: <BookOpen size={22} className="text-gold" />,
-              title: '5 key modules',
+              title: 'Essential Spanish',
               desc: 'Airport, taxi, restaurants, shops, and polite chat',
             },
           ].map((f) => (
@@ -87,6 +87,7 @@ export default function HomePage() {
 
       <footer className="border-t border-white/10 py-6 text-center">
         <p className="text-white/30 text-sm">Survival Chilean Spanish &copy; {new Date().getFullYear()}</p>
+        <p className="text-white/20 text-xs mt-2">Built by humans for humans</p>
       </footer>
     </div>
   );

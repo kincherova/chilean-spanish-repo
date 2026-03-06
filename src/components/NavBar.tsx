@@ -23,8 +23,7 @@ export default function NavBar({ back, title }: NavBarProps) {
             <span className="text-white font-semibold text-sm truncate max-w-[200px]">{title}</span>
           ) : (
             <Link to="/modules" className="flex items-center gap-2">
-              <span className="text-coral font-display font-bold text-lg">CS</span>
-              <span className="text-white/80 text-sm hidden sm:block">Chilean Spanish</span>
+              <span className="text-white font-display font-bold text-sm">Survival Chilean Spanish</span>
             </Link>
           )}
         </div>
