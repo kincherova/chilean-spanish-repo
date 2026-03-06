@@ -12,8 +12,8 @@ export default function OverviewPageView({ page, fontSize }: Props) {
     <div className="space-y-5">
       <h1 className={`font-display font-bold text-navy mb-2 ${fs.heading(fontSize)}`}>{page.title}</h1>
 
-      <div className="bg-coral/10 border border-coral/20 rounded-card-lg p-5 flex gap-3">
-        <Target size={20} className="text-coral flex-shrink-0 mt-0.5" />
+      <div className="bg-green-50 border border-green-200 rounded-card-lg p-5 flex gap-3">
+        <Target size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
         <div>
           <p className={`font-semibold text-navy mb-1 ${fs.bodySmall(fontSize)}`}>Goal</p>
           <p className={`text-muted leading-relaxed ${fs.bodySmall(fontSize)}`}>{page.goal}</p>

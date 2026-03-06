@@ -23,10 +23,10 @@ export default function DialogueView({ page, fontSize }: Props) {
               <div className={`max-w-[80%] rounded-card-lg px-4 py-3 ${
                 isLocal ? 'bg-navy text-white' :
                 isWaiter ? 'bg-teal/20 text-navy' :
-                'bg-coral/15 text-navy'
+                'bg-green-100 text-navy'
               }`}>
                 {line.name && (
-                  <p className={`font-semibold mb-1 ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : isWaiter ? 'text-teal' : 'text-coral'}`}>
+                  <p className={`font-semibold mb-1 ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : isWaiter ? 'text-teal' : 'text-green-600'}`}>
                     {line.name}
                   </p>
                 )}

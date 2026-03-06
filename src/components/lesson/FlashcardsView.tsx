@@ -66,7 +66,7 @@ export default function FlashcardsView({ flashcards, fontSize }: Props) {
             {card?.audio_url && (
               <button
                 onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
-                className="mt-4 p-2 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                className="mt-4 p-2 bg-green-100 hover:bg-green-200 rounded-full text-green-600 transition-colors"
               >
                 <Volume2 size={16} />
               </button>

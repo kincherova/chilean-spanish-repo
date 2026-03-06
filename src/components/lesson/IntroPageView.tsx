@@ -36,7 +36,7 @@ export default function IntroPageView({ page, fontSize }: Props) {
             {phrase.audioUrl && (
               <button
                 onClick={() => playAudio(phrase.audioUrl!)}
-                className="p-2 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors flex-shrink-0"
+                className="p-2 bg-green-100 hover:bg-green-200 rounded-full text-green-600 transition-colors flex-shrink-0"
               >
                 <Volume2 size={15} />
               </button>
