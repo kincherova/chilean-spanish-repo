@@ -133,7 +133,7 @@ export default function ModulesPage() {
                           {mod.completedLessons > 0 && (
                             <>
                               <span>·</span>
-                              <span className="text-coral font-medium">{pct}% done</span>
+                              <span className="text-green-600 font-medium">{pct}% done</span>
                             </>
                           )}
                         </div>
@@ -145,7 +145,7 @@ export default function ModulesPage() {
                   {pct > 0 && (
                     <div className="mt-4 bg-warm-bg rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="h-full bg-coral rounded-full transition-all"
+                        className="h-full bg-green-500 rounded-full transition-all"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
