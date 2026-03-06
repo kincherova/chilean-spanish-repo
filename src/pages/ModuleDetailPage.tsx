@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { fs } from '../components/lesson/fontSizeClasses';
 
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
@@ -88,9 +89,9 @@ export default function ModuleDetailPage() {
                 ) : null}
                 {isComplete && <CheckCircle2 size={14} className="text-green-500" />}
               </div>
-              <h3 className="font-semibold text-navy text-sm leading-snug mb-1">{unit.title}</h3>
-              <p className="text-muted text-xs leading-relaxed line-clamp-2">{unit.description}</p>
-              <div className="flex items-center gap-2 mt-1.5 text-xs text-muted">
+              <h3 className={`font-semibold text-navy leading-snug mb-1 ${fs.body(fontSize)}`}>{unit.title}</h3>
+              <p className={`text-muted leading-relaxed line-clamp-2 ${fs.bodySmall(fontSize)}`}>{unit.description}</p>
+              <div className={`flex items-center gap-2 mt-1.5 text-muted ${fs.label(fontSize)}`}>
                 <Clock size={11} />
                 <span>{unit.estimated_minutes} min</span>
                 {unit.lessons.length > 0 && (
@@ -122,7 +123,7 @@ export default function ModuleDetailPage() {
           <div>
             <div className="text-3xl mb-3">{module.icon === 'book' ? '📖' : module.icon}</div>
             <h1 className="font-display text-3xl font-bold text-navy mb-2">{module.title}</h1>
-            <p className="text-muted">{module.description}</p>
+            <p className={`text-muted ${fs.body(fontSize)}`}>{module.description}</p>
           </div>
           <button
             onClick={cycleFontSize}

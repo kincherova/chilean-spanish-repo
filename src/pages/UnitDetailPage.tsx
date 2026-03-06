@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { Unit, Lesson, Module } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { fs } from '../components/lesson/fontSizeClasses';
 
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
@@ -59,9 +60,9 @@ export default function UnitDetailPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs text-muted font-medium mb-1 uppercase tracking-wider">{module.title}</p>
+            <p className={`text-muted font-medium mb-1 uppercase tracking-wider ${fs.label(fontSize)}`}>{module.title}</p>
             <h1 className="font-display text-2xl font-bold text-navy mb-2">{unit.title}</h1>
-            <p className="text-muted text-sm leading-relaxed">{unit.description}</p>
+            <p className={`text-muted leading-relaxed ${fs.bodySmall(fontSize)}`}>{unit.description}</p>
           </div>
           <button
             onClick={cycleFontSize}
@@ -94,9 +95,9 @@ export default function UnitDetailPage() {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-navy text-sm">{lesson.title}</p>
+                    <p className={`font-medium text-navy ${fs.body(fontSize)}`}>{lesson.title}</p>
                     {lessonTypeLabel[lesson.type] && (
-                      <span className="text-xs text-muted">{lessonTypeLabel[lesson.type]}</span>
+                      <span className={`text-muted ${fs.label(fontSize)}`}>{lessonTypeLabel[lesson.type]}</span>
                     )}
                   </div>
                 </div>
@@ -114,8 +115,8 @@ export default function UnitDetailPage() {
                 <CreditCard size={15} className="text-teal" />
               </div>
               <div>
-                <p className="font-medium text-navy text-sm">Flashcards</p>
-                <span className="text-xs text-muted">Review vocabulary</span>
+                <p className={`font-medium text-navy ${fs.body(fontSize)}`}>Flashcards</p>
+                <span className={`text-muted ${fs.label(fontSize)}`}>Review vocabulary</span>
               </div>
             </div>
             <ChevronRight size={16} className="text-teal group-hover:translate-x-1 transition-transform" />

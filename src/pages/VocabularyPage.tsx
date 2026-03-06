@@ -4,6 +4,7 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { fs } from '../components/lesson/fontSizeClasses';
 import { Flashcard } from '../types/database';
 
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
@@ -167,8 +168,8 @@ export default function VocabularyPage() {
                 className="bg-white rounded-card-lg px-4 py-3.5 flex items-center justify-between gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-navy text-sm leading-snug">{card.spanish_text}</p>
-                  <p className="text-muted text-xs mt-0.5">{card.english_text}</p>
+                  <p className={`font-semibold text-navy leading-snug ${fs.body(fontSize)}`}>{card.spanish_text}</p>
+                  <p className={`text-muted mt-0.5 ${fs.bodySmall(fontSize)}`}>{card.english_text}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {card.audio_url && (

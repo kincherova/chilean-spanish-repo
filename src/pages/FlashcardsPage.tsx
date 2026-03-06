@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { fs } from '../components/lesson/fontSizeClasses';
 
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
@@ -154,7 +155,7 @@ export default function FlashcardsPage() {
               style={{ backfaceVisibility: 'hidden' }}
             >
               <p className="text-xs text-muted uppercase tracking-wider mb-4">Spanish</p>
-              <p className="font-display text-3xl font-bold text-navy text-center leading-tight">{card?.spanish_text}</p>
+              <p className={`font-display font-bold text-navy text-center leading-tight ${fs.heading(fontSize)}`}>{card?.spanish_text}</p>
               {card?.audio_url && (
                 <button
                   onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
@@ -170,7 +171,7 @@ export default function FlashcardsPage() {
               style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
             >
               <p className="text-xs text-white/50 uppercase tracking-wider mb-4">English</p>
-              <p className="font-display text-2xl font-bold text-white text-center leading-tight">{card?.english_text}</p>
+              <p className={`font-display font-bold text-white text-center leading-tight ${fs.heading(fontSize)}`}>{card?.english_text}</p>
             </div>
           </div>
         </button>
