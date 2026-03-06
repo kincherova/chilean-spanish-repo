@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
@@ -42,14 +42,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-navy flex flex-col items-center justify-center px-4">
-      <Link to="/" className="mb-8 text-center">
-        <div className="text-coral font-display font-bold text-4xl mb-1">CS</div>
-        <div className="text-white/60 text-sm">Survival Chilean Spanish</div>
-      </Link>
-
       <div className="w-full max-w-sm bg-white/5 border border-white/10 rounded-card-lg p-8">
         <h1 className="text-white font-display text-2xl font-bold mb-6 text-center">
-          {mode === 'login' ? 'Welcome back' : 'Create account'}
+          {mode === 'login' ? 'Welcome back' : 'Create an account'}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,7 +94,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-coral hover:bg-coral-dark text-white font-semibold py-3 rounded-card transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
+            {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create an account'}
           </button>
         </form>
 
