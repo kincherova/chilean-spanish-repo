@@ -1,8 +1,8 @@
-const CACHE_NAME = 'chilean-spanish-v3';
+const CACHE_NAME = 'chilean-spanish-v4';
 const STATIC_ASSETS = [
-  '/survival-chilean-spanish-2/',
-  '/survival-chilean-spanish-2/index.html',
-  '/survival-chilean-spanish-2/manifest.json',
+  '/',
+  '/index.html',
+  '/manifest.json',
 ];
 
 self.addEventListener('install', (event) => {
@@ -25,6 +25,18 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('/index.html').then((cached) => {
+        if (cached) return cached;
+        return fetch('/index.html');
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

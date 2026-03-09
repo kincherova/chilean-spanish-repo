@@ -16,7 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/survival-chilean-spanish-2">
+    <BrowserRouter>
       <AuthProvider>
         <ProgressProvider>
           <FontSizeProvider>
