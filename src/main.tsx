@@ -11,6 +11,6 @@ createRoot(document.getElementById('root')!).render(
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/survival-chilean-spanish/sw.js');
+    navigator.serviceWorker.register('/sw.js');
   });
 }
