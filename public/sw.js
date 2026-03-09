@@ -1,8 +1,8 @@
-const CACHE_NAME = 'chilean-spanish-v1';
+const CACHE_NAME = 'chilean-spanish-v3';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  '/survival-chilean-spanish-2/',
+  '/survival-chilean-spanish-2/index.html',
+  '/survival-chilean-spanish-2/manifest.json',
 ];
 
 self.addEventListener('install', (event) => {
