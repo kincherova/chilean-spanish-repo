@@ -5,10 +5,10 @@
     <title>Survival Chilean Spanish</title>
     <script>
       var l = window.location;
+      var base = '/survival-chilean-spanish';
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1).join('/') +
-        '/?p=/' + l.pathname.slice(1).replace(/&/g, '~and~') +
+        base + '/?p=' + l.pathname.slice(base.length).replace(/&/g, '~and~') +
         (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
         l.hash
       );
