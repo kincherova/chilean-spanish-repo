@@ -49,9 +49,9 @@ function useInstallPrompt() {
 export default function HomePage() {
   const { user } = useAuth();
   const { deferredPrompt, install, isInstalled, isIOS } = useInstallPrompt();
-  const [showIOSTip, setShowIOSTip] = useState(false);
+  const [showTip, setShowTip] = useState(false);
 
-  const showInstallButton = !isInstalled && (!!deferredPrompt || isIOS);
+  const showInstallButton = !isInstalled;
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -92,35 +92,49 @@ export default function HomePage() {
         </Link>
 
         {showInstallButton && (
-          <div className="mt-4">
-            {isIOS ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowIOSTip(!showIOSTip)}
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all"
-                >
-                  <Download size={15} />
-                  Add to Home Screen
-                </button>
-                {showIOSTip && (
-                  <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-64 bg-white text-navy rounded-xl shadow-xl p-4 text-sm z-10">
-                    <p className="font-semibold mb-1 text-center">Install on iPhone / iPad</p>
-                    <p className="text-navy/70 text-center leading-relaxed">
-                      Tap <Share size={13} className="inline mx-0.5 text-blue-500" /> <strong>Share</strong> in Safari, then choose <strong>"Add to Home Screen"</strong>
-                    </p>
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 rounded-sm" />
-                  </div>
-                )}
-              </div>
-            ) : (
+          <div className="mt-4 flex justify-center">
+            <div className="relative inline-block">
               <button
-                onClick={install}
+                onClick={async () => {
+                  if (deferredPrompt) {
+                    await install();
+                  } else {
+                    setShowTip(!showTip);
+                  }
+                }}
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all"
               >
                 <Download size={15} />
-                Download app
+                Download App
               </button>
-            )}
+
+              {showTip && (
+                <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-white text-navy rounded-xl shadow-2xl p-4 text-sm z-10">
+                  <button
+                    onClick={() => setShowTip(false)}
+                    className="absolute top-2 right-3 text-navy/40 hover:text-navy text-lg leading-none"
+                  >
+                    &times;
+                  </button>
+                  {isIOS ? (
+                    <>
+                      <p className="font-semibold mb-2 text-center">Install on iPhone / iPad</p>
+                      <p className="text-navy/70 text-center leading-relaxed">
+                        Tap <Share size={13} className="inline mx-0.5 text-blue-500" /> <strong>Share</strong> in Safari, then tap <strong>"Add to Home Screen"</strong>
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-semibold mb-2 text-center">Install on Android</p>
+                      <p className="text-navy/70 text-center leading-relaxed">
+                        Tap the <strong>3-dot menu</strong> in Chrome, then tap <strong>"Add to Home Screen"</strong>
+                      </p>
+                    </>
+                  )}
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 rounded-sm" />
+                </div>
+              )}
+            </div>
           </div>
         )}
       </section>
