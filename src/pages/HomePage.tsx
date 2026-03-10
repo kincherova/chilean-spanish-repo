@@ -143,9 +143,9 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             {
-              icon: <MessageCircle size={22} className="text-coral" />,
-              title: 'Real conversations',
-              desc: 'Practice authentic Chilean dialogues used every day',
+              icon: <BookOpen size={22} className="text-gold" />,
+              title: 'Essential Spanish',
+              desc: 'Airport, taxi, restaurants, shops, and polite chat',
             },
             {
               icon: <Volume2 size={22} className="text-teal" />,
@@ -153,9 +153,9 @@ export default function HomePage() {
               desc: 'Hear every phrase pronounced by a native Chilean speaker',
             },
             {
-              icon: <BookOpen size={22} className="text-gold" />,
-              title: 'Essential Spanish',
-              desc: 'Airport, taxi, restaurants, shops, and polite chat',
+              icon: <MessageCircle size={22} className="text-coral" />,
+              title: 'Real conversations',
+              desc: 'Practice authentic Chilean dialogues used every day',
             },
           ].map((f) => (
             <div key={f.title} className="bg-white/5 border border-white/10 rounded-card-lg p-6">
