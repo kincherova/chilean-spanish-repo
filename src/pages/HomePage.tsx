@@ -1,9 +1,57 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ArrowRight, Plane, MessageCircle, Volume2, BookOpen } from 'lucide-react';
+import { ArrowRight, Plane, MessageCircle, Volume2, BookOpen, Download, Share } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+function useInstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isInStandaloneMode =
+      ('standalone' in navigator && (navigator as { standalone?: boolean }).standalone === true) ||
+      window.matchMedia('(display-mode: standalone)').matches;
+
+    setIsIOS(isIOSDevice);
+    if (isInStandaloneMode) setIsInstalled(true);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => setIsInstalled(true));
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const install = async () => {
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setIsInstalled(true);
+    setDeferredPrompt(null);
+  };
+
+  return { deferredPrompt, install, isInstalled, isIOS };
+}
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { deferredPrompt, install, isInstalled, isIOS } = useInstallPrompt();
+  const [showIOSTip, setShowIOSTip] = useState(false);
+
+  const showInstallButton = !isInstalled && (!!deferredPrompt || isIOS);
 
   return (
     <div className="min-h-screen bg-navy text-white">
@@ -42,6 +90,39 @@ export default function HomePage() {
         >
           Start learning <ArrowRight size={20} />
         </Link>
+
+        {showInstallButton && (
+          <div className="mt-4">
+            {isIOS ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowIOSTip(!showIOSTip)}
+                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all"
+                >
+                  <Download size={15} />
+                  Add to Home Screen
+                </button>
+                {showIOSTip && (
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-64 bg-white text-navy rounded-xl shadow-xl p-4 text-sm z-10">
+                    <p className="font-semibold mb-1 text-center">Install on iPhone / iPad</p>
+                    <p className="text-navy/70 text-center leading-relaxed">
+                      Tap <Share size={13} className="inline mx-0.5 text-blue-500" /> <strong>Share</strong> in Safari, then choose <strong>"Add to Home Screen"</strong>
+                    </p>
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 rounded-sm" />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={install}
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all"
+              >
+                <Download size={15} />
+                Download app
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="max-w-4xl mx-auto px-6 pb-24">
