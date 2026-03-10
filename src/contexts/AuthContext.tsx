@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshPremium: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -69,12 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
+  const refreshPremium = async () => {
+    if (user) await fetchPremiumStatus(user.id);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isPremium, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isPremium, signIn, signUp, signOut, refreshPremium }}>
       {children}
     </AuthContext.Provider>
   );
