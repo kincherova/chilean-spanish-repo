@@ -90,7 +90,7 @@ export default function ProfilePage() {
               <p className="font-semibold text-navy text-lg">{displayName}</p>
               {isPremium && (
                 <span className="text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
-                  Premium
+                  Full Access
                 </span>
               )}
             </div>
@@ -124,7 +124,7 @@ export default function ProfilePage() {
               </p>
               <ul className="space-y-1.5 mb-5">
                 {[
-                  'All premium modules unlocked',
+                  'All modules unlocked, including the future ones',
                   'Full lesson library',
                   'All flashcard sets',
                 ].map((item) => (
@@ -145,7 +145,7 @@ export default function ProfilePage() {
                 ) : (
                   <Star size={15} className="fill-white" />
                 )}
-                {upgradeLoading ? 'Redirecting to checkout...' : 'Upgrade to Premium'}
+                {upgradeLoading ? 'Redirecting to checkout...' : 'Get full access'}
               </button>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
               <Star size={16} className="text-amber-500 fill-amber-400" />
             </div>
             <div>
-              <p className="font-semibold text-amber-900 text-sm">You have Premium access</p>
+              <p className="font-semibold text-amber-900 text-sm">You have full access to the content. Enjoy!</p>
               <p className="text-amber-700 text-xs mt-0.5">All modules and lessons are unlocked.</p>
             </div>
           </div>

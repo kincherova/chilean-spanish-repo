@@ -196,14 +196,13 @@ export default function ModulesPage() {
                       <Lock size={20} className="text-navy/70" strokeWidth={2} />
                     </div>
                     <div className="text-center">
-                      <p className="text-navy font-semibold text-sm">Premium Module</p>
                       <p className="text-muted text-xs mt-0.5">Upgrade to unlock all modules</p>
                     </div>
                     <button
                       className="mt-1 px-4 py-1.5 rounded-full bg-navy text-white text-xs font-semibold shadow-sm hover:bg-navy/90 transition-colors cursor-pointer"
                       onClick={() => navigate('/profile')}
                     >
-                      Upgrade to Premium
+                      Get full access
                     </button>
                   </div>
                 </div>
@@ -217,7 +216,7 @@ export default function ModulesPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-amber-900">
-                    {modules.filter((m) => !m.is_free).length} modules are premium-only
+                    {modules.filter((m) => !m.is_free).length} modules locked
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5">
                     Upgrade your account to unlock the full course and learn survival Chilean Spanish.
