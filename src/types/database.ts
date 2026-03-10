@@ -4,6 +4,7 @@ export interface Module {
   description: string;
   order_index: number;
   icon: string;
+  is_free: boolean;
   created_at: string;
 }
 
@@ -60,6 +61,7 @@ export interface UserProfile {
   name: string;
   email: string;
   onboarding_completed: boolean;
+  is_premium: boolean;
   created_at: string;
   updated_at: string;
 }

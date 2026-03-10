@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Clock, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Clock, ChevronRight, CheckCircle2, Lock } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { fs } from '../components/lesson/fontSizeClasses';
+import type { FontSize } from '../components/lesson/fontSizeClasses';
 
 const FONT_SIZE_LABELS: Record<string, string> = {
   normal: 'A',
@@ -21,11 +23,72 @@ interface ModuleWithStats extends Module {
   completedLessons: number;
 }
 
+interface ModuleCardContentProps {
+  mod: ModuleWithStats;
+  idx: number;
+  pct: number;
+  isComplete: boolean;
+  fontSize: FontSize;
+}
+
+function ModuleCardContent({ mod, idx, pct, isComplete, fontSize }: ModuleCardContentProps) {
+  return (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-4 flex-1 min-w-0">
+          <div className="w-10 h-10 rounded-card bg-warm-bg flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
+            {mod.icon === 'book' ? '📖' : mod.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`text-muted font-medium ${fs.label(fontSize)}`}>Module {idx + 1}</span>
+              {isComplete && <CheckCircle2 size={14} className="text-green-500" />}
+              {mod.is_free && (
+                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                  Free
+                </span>
+              )}
+            </div>
+            <h2 className={`font-semibold text-navy leading-snug mb-1 truncate ${fs.body(fontSize)}`}>
+              {mod.title}
+            </h2>
+            <p className={`text-muted leading-relaxed line-clamp-2 ${fs.bodySmall(fontSize)}`}>{mod.description}</p>
+            <div className={`flex items-center gap-3 mt-2 text-muted ${fs.label(fontSize)}`}>
+              <span>{mod.unitCount} units</span>
+              <span>·</span>
+              <Clock size={12} />
+              <span>{mod.totalMinutes} min</span>
+              {mod.completedLessons > 0 && (
+                <>
+                  <span>·</span>
+                  <span className="text-green-600 font-medium">{pct}% done</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        <ChevronRight size={18} className="text-muted group-hover:text-coral transition-colors flex-shrink-0 mt-1" />
+      </div>
+
+      {pct > 0 && (
+        <div className="mt-4 bg-warm-bg rounded-full h-1.5 overflow-hidden">
+          <div
+            className="h-full bg-green-500 rounded-full transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function ModulesPage() {
   const [modules, setModules] = useState<ModuleWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const { completedLessons } = useProgress();
   const { fontSize, cycleFontSize } = useFontSize();
+  const { isPremium } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function load() {
@@ -68,6 +131,8 @@ export default function ModulesPage() {
     load();
   }, [completedLessons]);
 
+  const fz = fontSize as FontSize;
+
   return (
     <div className="min-h-screen bg-warm-bg">
       <NavBar />
@@ -104,55 +169,62 @@ export default function ModulesPage() {
             {modules.map((mod, idx) => {
               const pct = mod.totalLessons > 0 ? Math.round((mod.completedLessons / mod.totalLessons) * 100) : 0;
               const isComplete = pct === 100;
+              const accessible = mod.is_free || isPremium;
+
+              if (accessible) {
+                return (
+                  <Link
+                    key={mod.id}
+                    to={`/modules/${mod.id}`}
+                    className="block bg-white hover:bg-cream rounded-card-lg p-5 transition-all hover:shadow-md border border-transparent hover:border-coral/20 group"
+                  >
+                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} />
+                  </Link>
+                );
+              }
 
               return (
-                <Link
+                <div
                   key={mod.id}
-                  to={`/modules/${mod.id}`}
-                  className="block bg-white hover:bg-cream rounded-card-lg p-5 transition-all hover:shadow-md border border-transparent hover:border-coral/20 group"
+                  className="relative rounded-card-lg overflow-hidden group"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <div className="w-10 h-10 rounded-card bg-warm-bg flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
-                        {mod.icon === 'book' ? '📖' : mod.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-muted font-medium ${fs.label(fontSize)}`}>Module {idx + 1}</span>
-                          {isComplete && <CheckCircle2 size={14} className="text-green-500" />}
-                        </div>
-                        <h2 className={`font-semibold text-navy leading-snug mb-1 truncate ${fs.body(fontSize)}`}>
-                          {mod.title}
-                        </h2>
-                        <p className={`text-muted leading-relaxed line-clamp-2 ${fs.bodySmall(fontSize)}`}>{mod.description}</p>
-                        <div className={`flex items-center gap-3 mt-2 text-muted ${fs.label(fontSize)}`}>
-                          <span>{mod.unitCount} units</span>
-                          <span>·</span>
-                          <Clock size={12} />
-                          <span>{mod.totalMinutes} min</span>
-                          {mod.completedLessons > 0 && (
-                            <>
-                              <span>·</span>
-                              <span className="text-green-600 font-medium">{pct}% done</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <ChevronRight size={18} className="text-muted group-hover:text-coral transition-colors flex-shrink-0 mt-1" />
+                  <div className="bg-white p-5 select-none pointer-events-none">
+                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} />
                   </div>
-
-                  {pct > 0 && (
-                    <div className="mt-4 bg-warm-bg rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
+                  <div className="absolute inset-0 backdrop-blur-[3px] bg-white/60 flex flex-col items-center justify-center gap-3 transition-all group-hover:bg-white/50">
+                    <div className="w-12 h-12 rounded-full bg-navy/10 border-2 border-navy/20 flex items-center justify-center shadow-sm">
+                      <Lock size={20} className="text-navy/70" strokeWidth={2} />
                     </div>
-                  )}
-                </Link>
+                    <div className="text-center">
+                      <p className="text-navy font-semibold text-sm">Premium Module</p>
+                      <p className="text-muted text-xs mt-0.5">Upgrade to unlock all modules</p>
+                    </div>
+                    <button
+                      className="mt-1 px-4 py-1.5 rounded-full bg-navy text-white text-xs font-semibold shadow-sm hover:bg-navy/90 transition-colors cursor-pointer"
+                      onClick={() => navigate('/profile')}
+                    >
+                      Upgrade to Premium
+                    </button>
+                  </div>
+                </div>
               );
             })}
+
+            {!isPremium && modules.some((m) => !m.is_free) && (
+              <div className="mt-2 p-4 rounded-card-lg border border-amber-200 bg-amber-50 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Lock size={14} className="text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">
+                    {modules.filter((m) => !m.is_free).length} modules are premium-only
+                  </p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    Upgrade your account to unlock the full course and learn survival Chilean Spanish.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
