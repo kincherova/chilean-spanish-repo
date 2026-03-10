@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const [practiceCount, setPracticeCount] = useState(0);
   const [masteredCount, setMasteredCount] = useState(0);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -44,6 +45,7 @@ export default function ProfilePage() {
   const handleUpgrade = async () => {
     if (!user) return;
     setUpgradeLoading(true);
+    setUpgradeError(null);
     try {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
@@ -61,9 +63,11 @@ export default function ProfilePage() {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create preference');
-      const checkoutUrl = data.sandbox_init_point || data.init_point;
+      const checkoutUrl = data.init_point;
+      if (!checkoutUrl) throw new Error('No checkout URL returned');
       window.location.href = checkoutUrl;
-    } catch {
+    } catch (err) {
+      setUpgradeError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setUpgradeLoading(false);
     }
   };
@@ -147,6 +151,9 @@ export default function ProfilePage() {
                 )}
                 {upgradeLoading ? 'Redirecting to checkout...' : 'Get full access'}
               </button>
+              {upgradeError && (
+                <p className="mt-3 text-xs text-red-600 text-center">{upgradeError}</p>
+              )}
             </div>
           </div>
         )}
