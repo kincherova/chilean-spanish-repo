@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import VocabularyPage from './pages/VocabularyPage';
 import PracticeFlashcardsPage from './pages/PracticeFlashcardsPage';
+import PaymentResultPage from './pages/PaymentResultPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -31,6 +32,9 @@ export default function App() {
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/vocabulary" element={<ProtectedRoute><VocabularyPage /></ProtectedRoute>} />
               <Route path="/vocabulary/practice" element={<ProtectedRoute><PracticeFlashcardsPage /></ProtectedRoute>} />
+              <Route path="/payment/success" element={<ProtectedRoute><PaymentResultPage result="success" /></ProtectedRoute>} />
+              <Route path="/payment/pending" element={<ProtectedRoute><PaymentResultPage result="pending" /></ProtectedRoute>} />
+              <Route path="/payment/failure" element={<ProtectedRoute><PaymentResultPage result="failure" /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </FontSizeProvider>

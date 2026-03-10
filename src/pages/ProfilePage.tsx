@@ -8,14 +8,13 @@ import { useProgress } from '../contexts/ProgressContext';
 import { UserProfile } from '../types/database';
 
 export default function ProfilePage() {
-  const { user, signOut, isPremium, refreshPremium } = useAuth();
+  const { user, signOut, isPremium } = useAuth();
   const { completedLessons } = useProgress();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [practiceCount, setPracticeCount] = useState(0);
   const [masteredCount, setMasteredCount] = useState(0);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
-  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -45,14 +44,28 @@ export default function ProfilePage() {
   const handleUpgrade = async () => {
     if (!user) return;
     setUpgradeLoading(true);
-    await supabase
-      .from('user_profiles')
-      .update({ is_premium: true })
-      .eq('id', user.id);
-    await refreshPremium();
-    setUpgradeLoading(false);
-    setUpgradeSuccess(true);
-    setTimeout(() => navigate('/modules'), 1500);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const appUrl = window.location.origin;
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/create-preference`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ appUrl }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create preference');
+      const checkoutUrl = data.sandbox_init_point || data.init_point;
+      window.location.href = checkoutUrl;
+    } catch {
+      setUpgradeLoading(false);
+    }
   };
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Learner';
@@ -122,25 +135,18 @@ export default function ProfilePage() {
                 ))}
               </ul>
 
-              {upgradeSuccess ? (
-                <div className="w-full py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold flex items-center justify-center gap-2">
-                  <CheckCircle2 size={16} />
-                  Upgraded! Redirecting...
-                </div>
-              ) : (
-                <button
-                  onClick={handleUpgrade}
-                  disabled={upgradeLoading}
-                  className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-                >
-                  {upgradeLoading ? (
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Star size={15} className="fill-white" />
-                  )}
-                  {upgradeLoading ? 'Upgrading...' : 'Upgrade to Premium'}
-                </button>
-              )}
+              <button
+                onClick={handleUpgrade}
+                disabled={upgradeLoading}
+                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {upgradeLoading ? (
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Star size={15} className="fill-white" />
+                )}
+                {upgradeLoading ? 'Redirecting to checkout...' : 'Upgrade to Premium'}
+              </button>
             </div>
           </div>
         )}
