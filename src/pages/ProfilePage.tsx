@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Lock, Sparkles } from 'lucide-react';
+import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Lock, Sparkles, KeyRound, X } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +8,7 @@ import { useProgress } from '../contexts/ProgressContext';
 import { UserProfile } from '../types/database';
 
 export default function ProfilePage() {
-  const { user, signOut, isPremium } = useAuth();
+  const { user, signOut, isPremium, refreshPremium } = useAuth();
   const { completedLessons } = useProgress();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -16,6 +16,10 @@ export default function ProfilePage() {
   const [masteredCount, setMasteredCount] = useState(0);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [upgradeError, setUpgradeError] = useState<string | null>(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [codeLoading, setCodeLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -70,6 +74,28 @@ export default function ProfilePage() {
       setUpgradeError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setUpgradeLoading(false);
     }
+  };
+
+  const handleAccessCode = async () => {
+    if (!user) return;
+    setCodeError(null);
+    if (accessCode.trim() !== '56990') {
+      setCodeError('Invalid access code. Please try again.');
+      return;
+    }
+    setCodeLoading(true);
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({ is_premium: true })
+      .eq('id', user.id);
+    if (error) {
+      setCodeError('Something went wrong. Please try again.');
+      setCodeLoading(false);
+      return;
+    }
+    await refreshPremium();
+    setCodeLoading(false);
+    setShowCodeInput(false);
   };
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Learner';
@@ -153,6 +179,47 @@ export default function ProfilePage() {
               </button>
               {upgradeError && (
                 <p className="mt-3 text-xs text-red-600 text-center">{upgradeError}</p>
+              )}
+
+              {!showCodeInput ? (
+                <button
+                  onClick={() => { setShowCodeInput(true); setCodeError(null); setAccessCode(''); }}
+                  className="mt-3 w-full py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                >
+                  <KeyRound size={15} />
+                  Have an access code?
+                </button>
+              ) : (
+                <div className="mt-3 rounded-xl border border-green-200 bg-green-50 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold text-green-800">Enter your access code</p>
+                    <button onClick={() => { setShowCodeInput(false); setCodeError(null); }} className="text-green-600 hover:text-green-800">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={accessCode}
+                      onChange={(e) => { setAccessCode(e.target.value); setCodeError(null); }}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAccessCode()}
+                      placeholder="Access code"
+                      className="flex-1 text-sm px-3 py-2 rounded-lg border border-green-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-400 text-navy placeholder-gray-400"
+                    />
+                    <button
+                      onClick={handleAccessCode}
+                      disabled={codeLoading || !accessCode.trim()}
+                      className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {codeLoading ? (
+                        <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      ) : 'Apply'}
+                    </button>
+                  </div>
+                  {codeError && (
+                    <p className="mt-2 text-xs text-red-600">{codeError}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>
