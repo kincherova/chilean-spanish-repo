@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Volume2, CheckCircle2, XCircle, ChevronRight, Play, SkipForward } from 'lucide-react';
 import { AudioChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
@@ -17,6 +17,7 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
   const [correctlyAnswered, setCorrectlyAnswered] = useState(false);
   const [done, setDone] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [showBravo, setShowBravo] = useState(false);
 
   const item = page.items[currentItem];
 
@@ -26,17 +27,6 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
     const audio = new Audio(item.audioUrl);
     audio.play().catch(() => {});
     audio.onended = () => setPlaying(false);
-  };
-
-  const handleSelect = (idx: number) => {
-    if (correctlyAnswered || wrongGuesses.has(idx)) return;
-    if (idx === item.correctAnswer) {
-      setCorrectlyAnswered(true);
-      onCorrect();
-    } else {
-      setWrongGuesses((prev) => new Set(prev).add(idx));
-      onWrong();
-    }
   };
 
   const advanceItem = () => {
@@ -49,6 +39,27 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
       setDone(true);
     }
   };
+
+  const handleSelect = (idx: number) => {
+    if (correctlyAnswered || wrongGuesses.has(idx)) return;
+    if (idx === item.correctAnswer) {
+      setCorrectlyAnswered(true);
+      setShowBravo(true);
+      onCorrect();
+    } else {
+      setWrongGuesses((prev) => new Set(prev).add(idx));
+      onWrong();
+    }
+  };
+
+  useEffect(() => {
+    if (!showBravo) return;
+    const timer = setTimeout(() => {
+      setShowBravo(false);
+      advanceItem();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showBravo]);
 
   if (done) {
     return (
@@ -67,7 +78,15 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
   }
 
   return (
-    <div>
+    <div className="relative">
+      {showBravo && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="bg-green-500 text-white font-bold text-2xl px-8 py-4 rounded-2xl shadow-2xl animate-bounce">
+            ¡Muy bien!
+          </div>
+        </div>
+      )}
+
       <h1 className={`font-display font-bold text-navy mb-1 ${fs.heading(fontSize)}`}>{page.title}</h1>
       <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
@@ -114,16 +133,6 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
       </div>
 
       <div className="space-y-2">
-        {correctlyAnswered && (
-          <button
-            onClick={advanceItem}
-            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
-          >
-            {currentItem < page.items.length - 1 ? 'Next question' : 'Continue'}
-            <ChevronRight size={18} />
-          </button>
-        )}
-
         <button
           onClick={advanceItem}
           className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 bg-white hover:bg-gray-50 text-muted font-medium rounded-card transition-colors text-sm"
