@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Lock, Sparkles, KeyRound, X } from 'lucide-react';
+import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Sparkles, KeyRound, X } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -240,6 +240,16 @@ export default function ProfilePage() {
 
         <div className="bg-white rounded-card-lg overflow-hidden mb-4">
           <Link
+            to="/modules"
+            className="w-full flex items-center justify-between px-5 py-4 hover:bg-warm-bg transition-colors group border-b border-gray-100"
+          >
+            <div className="flex items-center gap-3">
+              <BookOpen size={16} className="text-teal" />
+              <span className="font-medium text-sm text-navy">Go to modules</span>
+            </div>
+            <ChevronRight size={16} className="text-muted group-hover:text-coral transition-colors" />
+          </Link>
+          <Link
             to="/vocabulary"
             className="w-full flex items-center justify-between px-5 py-4 hover:bg-warm-bg transition-colors group"
           >
@@ -257,21 +267,6 @@ export default function ProfilePage() {
             <ChevronRight size={16} className="text-muted group-hover:text-coral transition-colors" />
           </Link>
         </div>
-
-        {!isPremium && (
-          <div className="bg-white rounded-card-lg overflow-hidden mb-4">
-            <Link
-              to="/modules"
-              className="w-full flex items-center justify-between px-5 py-4 hover:bg-warm-bg transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <Lock size={16} className="text-muted" />
-                <span className="font-medium text-sm text-navy">Back to modules</span>
-              </div>
-              <ChevronRight size={16} className="text-muted group-hover:text-coral transition-colors" />
-            </Link>
-          </div>
-        )}
 
         <div className="bg-white rounded-card-lg overflow-hidden">
           <button
