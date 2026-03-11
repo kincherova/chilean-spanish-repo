@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, BrainCircuit } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
@@ -78,7 +78,7 @@ export default function LessonPage() {
       setCurrentPage((p) => p + 1);
     } else {
       await markLessonComplete(lesson.id, quizAnswered > 0 ? Math.round((score / quizAnswered) * 100) : undefined);
-      navigate(`/modules/${moduleId}/units/${unitId}`);
+      navigate(`/modules/${moduleId}/units/${unitId}/flashcards`);
     }
   };
 
@@ -169,8 +169,17 @@ export default function LessonPage() {
               onClick={handleNext}
               className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
             >
-              {isLastPage ? 'Finish lesson' : 'Continue'}
-              <ChevronRight size={18} />
+              {isLastPage ? (
+                <>
+                  <BrainCircuit size={18} />
+                  Test your memory with flashcards
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ChevronRight size={18} />
+                </>
+              )}
             </button>
           </div>
         )}
