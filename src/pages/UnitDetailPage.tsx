@@ -122,6 +122,16 @@ export default function UnitDetailPage() {
             <ChevronRight size={16} className="text-teal group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
+
+        <div className="mt-8">
+          <Link
+            to={`/modules/${moduleId}`}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-card-lg border border-gray-200 bg-white text-muted hover:text-navy hover:border-gray-300 hover:shadow-sm transition-all font-medium text-sm"
+          >
+            <ChevronRight size={15} className="rotate-180" />
+            Go back to modules
+          </Link>
+        </div>
       </div>
     </div>
   );
