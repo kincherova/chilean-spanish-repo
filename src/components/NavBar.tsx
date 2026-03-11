@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, User, ChevronLeft } from 'lucide-react';
+import { BookOpen, User, ChevronLeft, LogIn } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavBarProps {
@@ -29,21 +29,30 @@ export default function NavBar({ back, title }: NavBarProps) {
         </div>
 
         <div className="flex items-center gap-1">
-          {user && (
+          {user ? (
+            <>
+              <Link
+                to="/vocabulary"
+                className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                title="My Vocabulary"
+              >
+                <BookOpen size={18} />
+              </Link>
+              <Link
+                to="/profile"
+                className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+              >
+                <User size={18} />
+              </Link>
+            </>
+          ) : (
             <Link
-              to="/vocabulary"
-              className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10"
-              title="My Vocabulary"
+              to="/login"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors rounded-lg hover:bg-white/10"
+              title="Sign in"
             >
-              <BookOpen size={18} />
-            </Link>
-          )}
-          {user && (
-            <Link
-              to="/profile"
-              className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10"
-            >
-              <User size={18} />
+              <LogIn size={16} />
+              <span className="hidden sm:inline">Sign in</span>
             </Link>
           )}
         </div>

@@ -85,7 +85,7 @@ export default function HomePage() {
         </p>
 
         <Link
-          to={user ? '/modules' : '/login'}
+          to="/modules"
           className="inline-flex items-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold px-8 py-4 rounded-full text-lg transition-all hover:gap-3"
         >
           Start learning <ArrowRight size={20} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Clock, ChevronRight, CheckCircle2, Lock } from 'lucide-react';
+import { Clock, ChevronRight, CheckCircle2, Lock, UserPlus, X } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
@@ -86,10 +86,19 @@ function ModuleCardContent({ mod, idx, pct, isComplete, fontSize, isPremium }: M
 export default function ModulesPage() {
   const [modules, setModules] = useState<ModuleWithStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSaveBanner, setShowSaveBanner] = useState(false);
   const { completedLessons } = useProgress();
   const { fontSize, cycleFontSize } = useFontSize();
-  const { isPremium } = useAuth();
+  const { isPremium, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem('save_banner_dismissed');
+    if (!user && !dismissed) {
+      const timer = setTimeout(() => setShowSaveBanner(true), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
 
   useEffect(() => {
     async function load() {
@@ -201,7 +210,7 @@ export default function ModulesPage() {
                     </div>
                     <button
                       className="mt-1 px-4 py-1.5 rounded-full bg-navy text-white text-xs font-semibold shadow-sm hover:bg-navy/90 transition-colors cursor-pointer"
-                      onClick={() => navigate('/profile')}
+                      onClick={() => navigate(user ? '/profile' : '/login')}
                     >
                       Get full access
                     </button>
@@ -223,6 +232,35 @@ export default function ModulesPage() {
                     Upgrade your account to unlock the full course and learn survival Chilean Spanish.
                   </p>
                 </div>
+              </div>
+            )}
+
+            {showSaveBanner && !user && (
+              <div className="mt-4 p-4 rounded-card-lg border border-teal/30 bg-teal/5 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-teal/10 border border-teal/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <UserPlus size={14} className="text-teal" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-navy">Save your progress</p>
+                  <p className="text-xs text-muted mt-0.5 leading-relaxed">
+                    Create a free account so you never lose your completed lessons.
+                  </p>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="mt-2 px-3 py-1.5 rounded-lg bg-navy text-white text-xs font-semibold hover:bg-navy/90 transition-colors"
+                  >
+                    Create account
+                  </button>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowSaveBanner(false);
+                    sessionStorage.setItem('save_banner_dismissed', '1');
+                  }}
+                  className="text-muted hover:text-navy transition-colors flex-shrink-0 mt-0.5"
+                >
+                  <X size={15} />
+                </button>
               </div>
             )}
           </div>

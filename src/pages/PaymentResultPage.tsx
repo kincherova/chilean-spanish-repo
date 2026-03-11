@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, ArrowRight, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -27,7 +27,7 @@ const config: Record<ResultType, {
   pending: {
     icon: <Clock size={40} className="text-amber-500" />,
     title: 'Payment pending',
-    subtitle: 'Your payment is being processed. We\'ll unlock your access as soon as it\'s confirmed.',
+    subtitle: "Your payment is being processed. We'll unlock your access as soon as it's confirmed.",
     bg: 'from-amber-50 to-orange-50',
     iconBg: 'bg-amber-100',
     btnLabel: 'Go to modules',
@@ -39,15 +39,15 @@ const config: Record<ResultType, {
     subtitle: 'Something went wrong with your payment. You can try again from your profile.',
     bg: 'from-red-50 to-rose-50',
     iconBg: 'bg-red-100',
-    btnLabel: 'Back to profile',
-    btnTo: '/profile',
+    btnLabel: 'Back to modules',
+    btnTo: '/modules',
   },
 };
 
 export default function PaymentResultPage({ result }: { result: ResultType }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { refreshPremium } = useAuth();
+  const { refreshPremium, user } = useAuth();
   const [verifying, setVerifying] = useState(result === 'success');
 
   useEffect(() => {
@@ -93,7 +93,25 @@ export default function PaymentResultPage({ result }: { result: ResultType }) {
         </div>
 
         <h1 className="text-xl font-bold text-gray-900 mb-2">{cfg.title}</h1>
-        <p className="text-gray-500 text-sm leading-relaxed mb-8">{cfg.subtitle}</p>
+        <p className="text-gray-500 text-sm leading-relaxed mb-6">{cfg.subtitle}</p>
+
+        {result === 'success' && !user && !verifying && (
+          <div className="mb-6 p-4 rounded-xl border border-teal/30 bg-teal/5 text-left">
+            <div className="flex items-center gap-2 mb-1">
+              <UserPlus size={15} className="text-teal flex-shrink-0" />
+              <p className="text-sm font-semibold text-navy">Save your access</p>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed mb-3">
+              Create an account so you can sign in from any device and never lose your progress.
+            </p>
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full py-2 rounded-lg bg-navy hover:bg-navy/90 text-white text-sm font-semibold transition-colors"
+            >
+              Create account
+            </button>
+          </div>
+        )}
 
         {verifying ? (
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500">

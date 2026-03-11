@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
+const LOCAL_PROGRESS_KEY = 'guest_completed_lessons';
+
 interface ProgressContextType {
   completedLessons: Set<string>;
   markLessonComplete: (lessonId: string, score?: number) => Promise<void>;
@@ -11,13 +13,27 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | null>(null);
 
+function loadLocalProgress(): Set<string> {
+  try {
+    const raw = localStorage.getItem(LOCAL_PROGRESS_KEY);
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set();
+}
+
+function saveLocalProgress(lessons: Set<string>) {
+  try {
+    localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify([...lessons]));
+  } catch {}
+}
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
 
   const refreshProgress = useCallback(async () => {
     if (!user) {
-      setCompletedLessons(new Set());
+      setCompletedLessons(loadLocalProgress());
       return;
     }
     const { data } = await supabase
@@ -35,7 +51,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [refreshProgress]);
 
   const markLessonComplete = async (lessonId: string, score?: number) => {
-    if (!user) return;
+    if (!user) {
+      setCompletedLessons((prev) => {
+        const next = new Set([...prev, lessonId]);
+        saveLocalProgress(next);
+        return next;
+      });
+      return;
+    }
     await supabase.from('user_progress').upsert({
       user_id: user.id,
       lesson_id: lessonId,

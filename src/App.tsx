@@ -24,17 +24,17 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/modules" element={<ProtectedRoute><ModulesPage /></ProtectedRoute>} />
-              <Route path="/modules/:moduleId" element={<ProtectedRoute><ModuleDetailPage /></ProtectedRoute>} />
-              <Route path="/modules/:moduleId/units/:unitId" element={<ProtectedRoute><UnitDetailPage /></ProtectedRoute>} />
-              <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-              <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
+              <Route path="/modules" element={<ModulesPage />} />
+              <Route path="/modules/:moduleId" element={<ModuleDetailPage />} />
+              <Route path="/modules/:moduleId/units/:unitId" element={<UnitDetailPage />} />
+              <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<LessonPage />} />
+              <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<FlashcardsPage />} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/vocabulary" element={<ProtectedRoute><VocabularyPage /></ProtectedRoute>} />
               <Route path="/vocabulary/practice" element={<ProtectedRoute><PracticeFlashcardsPage /></ProtectedRoute>} />
-              <Route path="/payment/success" element={<ProtectedRoute><PaymentResultPage result="success" /></ProtectedRoute>} />
-              <Route path="/payment/pending" element={<ProtectedRoute><PaymentResultPage result="pending" /></ProtectedRoute>} />
-              <Route path="/payment/failure" element={<ProtectedRoute><PaymentResultPage result="failure" /></ProtectedRoute>} />
+              <Route path="/payment/success" element={<PaymentResultPage result="success" />} />
+              <Route path="/payment/pending" element={<PaymentResultPage result="pending" />} />
+              <Route path="/payment/failure" element={<PaymentResultPage result="failure" />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </FontSizeProvider>
