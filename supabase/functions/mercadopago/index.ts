@@ -62,7 +62,7 @@ async function handleWebhook(req: Request) {
   const topic = url.searchParams.get("topic") || url.searchParams.get("type");
   const id = url.searchParams.get("id") || url.searchParams.get("data.id");
 
-  if (topic !== "payment" && topic !== "payment") {
+  if (topic !== "payment") {
     return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
@@ -98,6 +98,86 @@ async function handleWebhook(req: Request) {
   }
 
   return new Response("ok", { status: 200, headers: corsHeaders });
+}
+
+async function handleProcessPayment(req: Request) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const db = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    global: { headers: { Authorization: authHeader } },
+  });
+
+  const { data: { user }, error: authError } = await db.auth.getUser();
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const formData = await req.json().catch(() => null);
+  if (!formData) {
+    return new Response(JSON.stringify({ error: "Invalid request body" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const paymentBody = {
+    ...formData,
+    external_reference: user.id,
+    notification_url: `${SUPABASE_URL}/functions/v1/mercadopago/webhook`,
+    payer: {
+      ...formData.payer,
+      email: formData.payer?.email || user.email,
+    },
+  };
+
+  const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+      "X-Idempotency-Key": `${user.id}-${Date.now()}`,
+    },
+    body: JSON.stringify(paymentBody),
+  });
+
+  if (!mpRes.ok) {
+    const err = await mpRes.text();
+    return new Response(JSON.stringify({ error: `MercadoPago error: ${err}` }), {
+      status: mpRes.status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const payment = await mpRes.json();
+  const status = payment.status;
+  const admin = supabaseAdmin();
+
+  await admin.from("payments").insert({
+    user_id: user.id,
+    mp_payment_id: String(payment.id),
+    mp_preference_id: String(payment.order?.id ?? ""),
+    status,
+    amount: payment.transaction_amount ?? 9990,
+    currency: payment.currency_id ?? "CLP",
+  });
+
+  if (status === "approved") {
+    await admin.from("user_profiles").update({ is_premium: true }).eq("id", user.id);
+  }
+
+  return new Response(
+    JSON.stringify({ status, payment_id: payment.id, is_premium: status === "approved" }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
 }
 
 Deno.serve(async (req: Request) => {
@@ -152,6 +232,10 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({ init_point: preference.init_point, sandbox_init_point: preference.sandbox_init_point, id: preference.id }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    if (path === "/process-payment" || path === "/process-payment/") {
+      return handleProcessPayment(req);
     }
 
     if (path === "/verify" || path === "/verify/") {

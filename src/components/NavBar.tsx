@@ -3,7 +3,7 @@ import { BookOpen, User, ChevronLeft, LogIn } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface NavBarProps {
-  back?: string;
+  back?: string | (() => void);
   title?: string;
 }
 
@@ -15,9 +15,15 @@ export default function NavBar({ back, title }: NavBarProps) {
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {back ? (
-            <Link to={back} className="text-white/70 hover:text-white transition-colors p-1 -ml-1">
-              <ChevronLeft size={22} />
-            </Link>
+            typeof back === 'function' ? (
+              <button onClick={back} className="text-white/70 hover:text-white transition-colors p-1 -ml-1">
+                <ChevronLeft size={22} />
+              </button>
+            ) : (
+              <Link to={back} className="text-white/70 hover:text-white transition-colors p-1 -ml-1">
+                <ChevronLeft size={22} />
+              </Link>
+            )
           ) : null}
           {title ? (
             <span className="text-white font-semibold text-sm truncate max-w-[200px]">{title}</span>
