@@ -210,7 +210,7 @@ export default function ModulesPage() {
                     </div>
                     <button
                       className="mt-1 px-4 py-1.5 rounded-full bg-navy text-white text-xs font-semibold shadow-sm hover:bg-navy/90 transition-colors cursor-pointer"
-                      onClick={() => navigate(user ? '/profile' : '/login')}
+                      onClick={() => navigate('/upgrade')}
                     >
                       Get full access
                     </button>
@@ -224,13 +224,19 @@ export default function ModulesPage() {
                 <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Lock size={14} className="text-amber-600" />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-amber-900">
                     {modules.filter((m) => !m.is_free).length} modules locked
                   </p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    Upgrade your account to unlock the full course and learn survival Chilean Spanish.
+                  <p className="text-xs text-amber-700 mt-0.5 mb-2">
+                    Unlock the full course to learn survival Chilean Spanish.
                   </p>
+                  <button
+                    onClick={() => navigate('/upgrade')}
+                    className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors"
+                  >
+                    Get full access
+                  </button>
                 </div>
               </div>
             )}

@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 import VocabularyPage from './pages/VocabularyPage';
 import PracticeFlashcardsPage from './pages/PracticeFlashcardsPage';
 import PaymentResultPage from './pages/PaymentResultPage';
+import UpgradePage from './pages/UpgradePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/modules/:moduleId/units/:unitId" element={<UnitDetailPage />} />
               <Route path="/modules/:moduleId/units/:unitId/lessons/:lessonId" element={<LessonPage />} />
               <Route path="/modules/:moduleId/units/:unitId/flashcards" element={<FlashcardsPage />} />
+              <Route path="/upgrade" element={<UpgradePage />} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/vocabulary" element={<ProtectedRoute><VocabularyPage /></ProtectedRoute>} />
               <Route path="/vocabulary/practice" element={<ProtectedRoute><PracticeFlashcardsPage /></ProtectedRoute>} />
