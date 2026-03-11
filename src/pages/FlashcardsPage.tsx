@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen, PartyPopper } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Flashcard, UserFlashcardTag } from '../types/database';
@@ -14,6 +14,8 @@ export default function FlashcardsPage() {
   const { moduleId, unitId } = useParams<{ moduleId: string; unitId: string }>();
   const { user } = useAuth();
   const { fontSize, cycleFontSize } = useFontSize();
+  const navigate = useNavigate();
+  const [finished, setFinished] = useState(false);
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [tags, setTags] = useState<Record<string, UserFlashcardTag['tag']>>({});
@@ -78,7 +80,14 @@ export default function FlashcardsPage() {
   };
 
   const prev = () => { setFlipped(false); setCurrentIndex((i) => Math.max(0, i - 1)); };
-  const next = () => { setFlipped(false); setCurrentIndex((i) => Math.min(flashcards.length - 1, i + 1)); };
+  const next = () => {
+    if (currentIndex === flashcards.length - 1) {
+      setFinished(true);
+    } else {
+      setFlipped(false);
+      setCurrentIndex((i) => i + 1);
+    }
+  };
 
   if (loading) {
     return (
@@ -103,6 +112,36 @@ export default function FlashcardsPage() {
   }
 
   const currentTag = card ? tags[card.id] : null;
+
+  if (finished) {
+    return (
+      <div className="min-h-screen bg-warm-bg">
+        <NavBar back={`/modules/${moduleId}/units/${unitId}`} title="Flashcards" />
+        <div className="max-w-sm mx-auto px-4 py-16 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mb-6 shadow-sm">
+            <PartyPopper size={36} className="text-amber-500" />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-navy mb-3">¡Buen trabajo!</h2>
+          <p className="text-muted text-sm leading-relaxed max-w-xs mb-8">
+            You can access the words you marked "Practice" in your personal vocabulary list{' '}
+            <BookOpen size={14} className="inline-block align-middle text-coral" />
+          </p>
+          <button
+            onClick={() => navigate('/modules')}
+            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
+          >
+            Go back to modules
+          </button>
+          <button
+            onClick={() => { setFinished(false); setCurrentIndex(0); setFlipped(false); }}
+            className="mt-3 text-sm text-muted hover:text-navy transition-colors"
+          >
+            Review cards again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-warm-bg">
@@ -205,10 +244,10 @@ export default function FlashcardsPage() {
           </button>
           <button
             onClick={next}
-            disabled={currentIndex === flashcards.length - 1}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-coral hover:bg-coral-dark text-white rounded-card font-medium text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-coral hover:bg-coral-dark text-white rounded-card font-medium text-sm transition-colors"
           >
-            Next <ChevronRight size={16} />
+            {currentIndex === flashcards.length - 1 ? 'Finish' : 'Next'}
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>
