@@ -29,9 +29,10 @@ interface ModuleCardContentProps {
   pct: number;
   isComplete: boolean;
   fontSize: FontSize;
+  isPremium: boolean;
 }
 
-function ModuleCardContent({ mod, idx, pct, isComplete, fontSize }: ModuleCardContentProps) {
+function ModuleCardContent({ mod, idx, pct, isComplete, fontSize, isPremium }: ModuleCardContentProps) {
   return (
     <>
       <div className="flex items-start justify-between gap-3">
@@ -43,7 +44,7 @@ function ModuleCardContent({ mod, idx, pct, isComplete, fontSize }: ModuleCardCo
             <div className="flex items-center gap-2 mb-1">
               <span className={`text-muted font-medium ${fs.label(fontSize)}`}>Module {idx + 1}</span>
               {isComplete && <CheckCircle2 size={14} className="text-green-500" />}
-              {mod.is_free && (
+              {mod.is_free && !isPremium && (
                 <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                   Free
                 </span>
@@ -178,7 +179,7 @@ export default function ModulesPage() {
                     to={`/modules/${mod.id}`}
                     className="block bg-white hover:bg-cream rounded-card-lg p-5 transition-all hover:shadow-md border border-transparent hover:border-coral/20 group"
                   >
-                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} />
+                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} isPremium={isPremium} />
                   </Link>
                 );
               }
@@ -189,7 +190,7 @@ export default function ModulesPage() {
                   className="relative rounded-card-lg overflow-hidden group"
                 >
                   <div className="bg-white p-5 select-none pointer-events-none">
-                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} />
+                    <ModuleCardContent mod={mod} idx={idx} pct={pct} isComplete={isComplete} fontSize={fz} isPremium={isPremium} />
                   </div>
                   <div className="absolute inset-0 backdrop-blur-[3px] bg-white/60 flex flex-col items-center justify-center gap-3 transition-all group-hover:bg-white/50">
                     <div className="w-12 h-12 rounded-full bg-navy/10 border-2 border-navy/20 flex items-center justify-center shadow-sm">
