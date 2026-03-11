@@ -123,20 +123,22 @@ export default function FlashcardsPage() {
           </div>
           <h2 className="font-display text-2xl font-bold text-navy mb-3">¡Buen trabajo!</h2>
           <p className="text-muted text-sm leading-relaxed max-w-xs mb-8">
-            You can access the words you marked "Practice" in your personal vocabulary list{' '}
+            You can access the words you marked{' '}
+            <span className="font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-white text-xs">Practice</span>
+            {' '}in your personal vocabulary list{' '}
             <BookOpen size={14} className="inline-block align-middle text-coral" />
           </p>
           <button
-            onClick={() => navigate('/modules')}
+            onClick={() => { setFinished(false); setCurrentIndex(0); setFlipped(false); }}
             className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
           >
-            Go back to modules
+            Review cards again
           </button>
           <button
-            onClick={() => { setFinished(false); setCurrentIndex(0); setFlipped(false); }}
+            onClick={() => navigate('/modules')}
             className="mt-3 text-sm text-muted hover:text-navy transition-colors"
           >
-            Review cards again
+            Go back to modules
           </button>
         </div>
       </div>
