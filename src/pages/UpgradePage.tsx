@@ -17,8 +17,14 @@ export default function UpgradePage() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeLoading, setCodeLoading] = useState(false);
 
+  const [showAuthCodeInput, setShowAuthCodeInput] = useState(false);
+  const [authCode, setAuthCode] = useState('');
+  const [authCodeError, setAuthCodeError] = useState<string | null>(null);
+  const [authCodeLoading, setAuthCodeLoading] = useState(false);
+
   const [authStep, setAuthStep] = useState<'idle' | 'auth'>('idle');
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [authIntent, setAuthIntent] = useState<'payment' | 'code'>('payment');
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -66,7 +72,6 @@ export default function UpgradePage() {
     e.preventDefault();
     setAuthError('');
     setAuthLoading(true);
-    let token: string | undefined;
     if (authMode === 'signup') {
       if (!authName.trim()) { setAuthError('Please enter your name'); setAuthLoading(false); return; }
       const { error } = await signUp(authEmail, authPassword, authName);
@@ -76,9 +81,34 @@ export default function UpgradePage() {
       if (error) { setAuthError('Invalid email or password'); setAuthLoading(false); return; }
     }
     const session = await supabase.auth.getSession();
-    token = session.data.session?.access_token;
+    const uid = session.data.session?.user.id;
+    const token = session.data.session?.access_token;
     setAuthLoading(false);
+    if (authIntent === 'code' && uid) {
+      const { error } = await supabase.from('user_profiles').update({ is_premium: true }).eq('id', uid);
+      if (!error) { await refreshPremium(); navigate('/modules'); return; }
+    }
     await startCheckout(token);
+  };
+
+  const handleAuthCode = async () => {
+    setAuthCodeError(null);
+    if (authCode.trim() !== '56990') {
+      setAuthCodeError('Invalid access code. Please try again.');
+      return;
+    }
+    if (!user) {
+      setAuthIntent('code');
+      setAuthStep('auth');
+      setAuthMode('signup');
+      return;
+    }
+    setAuthCodeLoading(true);
+    const { error } = await supabase.from('user_profiles').update({ is_premium: true }).eq('id', user.id);
+    if (error) { setAuthCodeError('Something went wrong. Please try again.'); setAuthCodeLoading(false); return; }
+    await refreshPremium();
+    setAuthCodeLoading(false);
+    navigate('/modules');
   };
 
   const handleAccessCode = async () => {
@@ -135,9 +165,13 @@ export default function UpgradePage() {
               {authMode === 'signup' ? 'Create an account to continue' : 'Sign in to continue'}
             </h2>
             <p className="text-sm text-muted mb-5">
-              {authMode === 'signup'
-                ? 'You need an account so your access is linked to you.'
-                : 'Sign in to your existing account to continue to checkout.'}
+              {authIntent === 'code'
+                ? authMode === 'signup'
+                  ? 'Create a free account so your access can be activated.'
+                  : 'Sign in to activate your access code.'
+                : authMode === 'signup'
+                  ? 'You need an account so your access is linked to you.'
+                  : 'Sign in to your existing account to continue to checkout.'}
             </p>
             <form onSubmit={handleAuth} className="space-y-4">
               {authMode === 'signup' && (
@@ -189,9 +223,53 @@ export default function UpgradePage() {
                 ) : (
                   <Star size={15} className="fill-white" />
                 )}
-                {authLoading ? 'Redirecting to checkout...' : 'Continue to payment'}
+                {authLoading
+                  ? (authIntent === 'code' ? 'Activating...' : 'Redirecting to checkout...')
+                  : (authIntent === 'code' ? 'Activate access' : 'Continue to payment')}
               </button>
             </form>
+
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              {!showAuthCodeInput ? (
+                <button
+                  onClick={() => { setShowAuthCodeInput(true); setAuthCodeError(null); setAuthCode(''); }}
+                  className="w-full py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                >
+                  <KeyRound size={15} />
+                  Have an access code?
+                </button>
+              ) : (
+                <div className="rounded-xl border border-green-200 bg-green-50 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold text-green-800">Enter your access code</p>
+                    <button onClick={() => { setShowAuthCodeInput(false); setAuthCodeError(null); }} className="text-green-600 hover:text-green-800">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={authCode}
+                      onChange={(e) => { setAuthCode(e.target.value); setAuthCodeError(null); }}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAuthCode()}
+                      placeholder="Access code"
+                      className="flex-1 text-sm px-3 py-2 rounded-lg border border-green-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-400 text-navy placeholder-gray-400"
+                    />
+                    <button
+                      onClick={handleAuthCode}
+                      disabled={authCodeLoading || !authCode.trim()}
+                      className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {authCodeLoading ? (
+                        <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      ) : 'Apply'}
+                    </button>
+                  </div>
+                  {authCodeError && <p className="mt-2 text-xs text-red-600">{authCodeError}</p>}
+                </div>
+              )}
+            </div>
+
             <p className="text-center text-sm text-muted mt-4">
               {authMode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
