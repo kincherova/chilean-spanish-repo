@@ -96,6 +96,7 @@ export default function ProfilePage() {
     await refreshPremium();
     setCodeLoading(false);
     setShowCodeInput(false);
+    navigate('/modules');
   };
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Learner';
