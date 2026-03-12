@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Star, Sparkles, KeyRound, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import NavBar from '../components/NavBar';
@@ -23,12 +23,16 @@ type PaymentStatus = 'approved' | 'pending' | 'rejected';
 function loadMPScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.MercadoPago) { resolve(); return; }
+
     const existing = document.querySelector('script[src="https://sdk.mercadopago.com/js/v2"]');
     if (existing) {
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('Failed to load MercadoPago SDK')));
+      const poll = setInterval(() => {
+        if (window.MercadoPago) { clearInterval(poll); resolve(); }
+      }, 50);
+      setTimeout(() => { clearInterval(poll); reject(new Error('MercadoPago SDK timed out')); }, 10000);
       return;
     }
+
     const script = document.createElement('script');
     script.src = 'https://sdk.mercadopago.com/js/v2';
     script.onload = () => resolve();
@@ -57,7 +61,6 @@ export default function UpgradePage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [brickError, setBrickError] = useState<string | null>(null);
 
-  const brickMountedRef = useRef(false);
   const MP_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY as string;
 
   useEffect(() => {
@@ -65,8 +68,15 @@ export default function UpgradePage() {
 
     let cancelled = false;
 
+    const unmountBrick = () => {
+      if (window.paymentBrickController) {
+        try { window.paymentBrickController.unmount(); } catch (_) { /* ignore */ }
+        window.paymentBrickController = undefined;
+      }
+    };
+
     const mount = async () => {
-      if (brickMountedRef.current) return;
+      unmountBrick();
 
       try {
         await loadMPScript();
@@ -84,9 +94,15 @@ export default function UpgradePage() {
           return;
         }
 
-        const token = session.access_token;
-        brickMountedRef.current = true;
+        const container = document.getElementById('paymentBrick_container');
+        if (!container) {
+          setBrickError('Payment form container not found. Please try again.');
+          return;
+        }
+        container.innerHTML = '';
+        if (cancelled) return;
 
+        const token = session.access_token;
         const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
         const bricksBuilder = mp.bricks();
 
@@ -154,14 +170,19 @@ export default function UpgradePage() {
 
         if (cancelled) return;
 
-        window.paymentBrickController = await bricksBuilder.create(
+        const controller = await bricksBuilder.create(
           'payment',
           'paymentBrick_container',
           settings
         );
+
+        if (cancelled) {
+          try { controller.unmount(); } catch (_) { /* ignore */ }
+        } else {
+          window.paymentBrickController = controller;
+        }
       } catch (err) {
         if (!cancelled) {
-          brickMountedRef.current = false;
           setBrickError(err instanceof Error ? err.message : 'Failed to load payment form.');
         }
       }
@@ -171,11 +192,7 @@ export default function UpgradePage() {
 
     return () => {
       cancelled = true;
-      if (window.paymentBrickController) {
-        window.paymentBrickController.unmount();
-        window.paymentBrickController = undefined;
-      }
-      brickMountedRef.current = false;
+      unmountBrick();
     };
   }, [step]);
 
