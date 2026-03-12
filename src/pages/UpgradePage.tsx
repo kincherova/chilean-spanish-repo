@@ -268,16 +268,29 @@ export default function UpgradePage() {
       return;
     }
     setCodeError(null);
-    if (accessCode.trim() !== '56990') {
-      setCodeError('Invalid access code. Please try again.');
-      return;
-    }
     setCodeLoading(true);
-    const { error } = await supabase.from('user_profiles').update({ is_premium: true }).eq('id', user.id);
-    if (error) { setCodeError('Something went wrong. Please try again.'); setCodeLoading(false); return; }
-    await refreshPremium();
-    setCodeLoading(false);
-    navigate('/modules');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/redeem-code`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ code: accessCode.trim() }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) { setCodeError(data.error || 'Invalid access code. Please try again.'); setCodeLoading(false); return; }
+      await refreshPremium();
+      setCodeLoading(false);
+      navigate('/modules');
+    } catch {
+      setCodeError('Something went wrong. Please try again.');
+      setCodeLoading(false);
+    }
   };
 
   if (isPremium) {

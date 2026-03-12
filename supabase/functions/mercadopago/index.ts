@@ -301,6 +301,82 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    if (path === "/redeem-code" || path === "/redeem-code/") {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const db = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+
+      const { data: { user }, error: authError } = await db.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const body = await req.json().catch(() => ({}));
+      const rawCode = (body.code ?? "").trim().toLowerCase();
+
+      if (!rawCode) {
+        return new Response(JSON.stringify({ error: "No code provided" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const admin = supabaseAdmin();
+
+      const { data: codeRow, error: codeError } = await admin
+        .from("access_codes")
+        .select("id, is_active, max_uses, use_count")
+        .eq("code", rawCode)
+        .maybeSingle();
+
+      if (codeError || !codeRow) {
+        return new Response(JSON.stringify({ error: "Invalid access code" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (!codeRow.is_active) {
+        return new Response(JSON.stringify({ error: "This access code is no longer active" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (codeRow.max_uses !== null && codeRow.use_count >= codeRow.max_uses) {
+        return new Response(JSON.stringify({ error: "This access code has reached its usage limit" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await admin
+        .from("access_codes")
+        .update({ use_count: codeRow.use_count + 1 })
+        .eq("id", codeRow.id);
+
+      await admin
+        .from("user_profiles")
+        .update({ is_premium: true })
+        .eq("id", user.id);
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(JSON.stringify({ error: "Not found" }), {
       status: 404,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
