@@ -75,7 +75,7 @@ export default function UpgradePage() {
         return;
       }
 
-      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'en-US' });
+      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
       const bricksBuilder = mp.bricks();
 
       const settings = {
