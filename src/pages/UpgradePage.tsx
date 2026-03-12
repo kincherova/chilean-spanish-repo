@@ -119,10 +119,6 @@ export default function UpgradePage() {
             visual: {
               style: { theme: 'flat' },
             },
-            fields: {
-              cardholderIdentificationNumber: { visibility: 'hidden' },
-              cardholderIdentificationTypeSelect: { visibility: 'hidden' },
-            },
             paymentMethods: {
               creditCard: 'all',
               debitCard: 'all',
@@ -132,7 +128,43 @@ export default function UpgradePage() {
             },
           },
           callbacks: {
-            onReady: () => {},
+            onReady: () => {
+              const hideIdentification = () => {
+                const container = document.getElementById('paymentBrick_container');
+                if (!container) return;
+                const style = document.createElement('style');
+                style.textContent = `
+                  [data-testid="identification-section"],
+                  [data-testid="cardholderIdentification"],
+                  [class*="identification"],
+                  [id*="identification"] {
+                    display: none !important;
+                  }
+                `;
+                container.appendChild(style);
+
+                container.querySelectorAll('iframe').forEach((iframe) => {
+                  try {
+                    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                    if (doc) {
+                      const iStyle = doc.createElement('style');
+                      iStyle.textContent = `
+                        [data-testid="identification-section"],
+                        [data-testid="cardholderIdentification"],
+                        [class*="identification"],
+                        [id*="identification"] {
+                          display: none !important;
+                        }
+                      `;
+                      doc.head?.appendChild(iStyle);
+                    }
+                  } catch (_) {}
+                });
+              };
+              hideIdentification();
+              setTimeout(hideIdentification, 500);
+              setTimeout(hideIdentification, 1500);
+            },
             onSubmit: ({ formData }: { selectedPaymentMethod: string; formData: object }) => {
               return new Promise<void>((resolve, reject) => {
                 (async () => {
