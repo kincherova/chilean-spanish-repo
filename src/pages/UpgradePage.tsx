@@ -81,7 +81,7 @@ export default function UpgradePage() {
 
       const settings = {
         initialization: {
-          amount: 9990,
+          amount: 19900,
           payer: {
             firstName: '',
             lastName: '',
@@ -281,7 +281,7 @@ export default function UpgradePage() {
               <p className="text-sm font-semibold text-navy">Survival Chilean Spanish</p>
               <p className="text-xs text-muted">Full access — all modules unlocked</p>
             </div>
-            <p className="text-lg font-bold text-navy">$9.990 CLP</p>
+            <p className="text-lg font-bold text-navy">$19.900 CLP</p>
           </div>
 
           {brickError && (
@@ -453,9 +453,13 @@ export default function UpgradePage() {
               ))}
             </ul>
 
-            <div className="flex items-baseline gap-1 mb-5">
-              <span className="text-3xl font-bold text-amber-900">$9.990</span>
-              <span className="text-amber-700 text-sm">CLP</span>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-amber-900">$19.900</span>
+                <span className="text-amber-700 text-sm">CLP</span>
+              </div>
+              <span className="text-sm text-amber-600 line-through">$49.900</span>
+              <span className="text-xs font-semibold bg-amber-500 text-white px-2 py-0.5 rounded-full">60% off</span>
             </div>
 
             <button

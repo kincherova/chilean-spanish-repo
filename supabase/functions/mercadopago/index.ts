@@ -24,7 +24,7 @@ async function createPreference(userId: string, userEmail: string, appUrl: strin
         description: "Unlock all 5 modules and every lesson",
         quantity: 1,
         currency_id: "CLP",
-        unit_price: 9990,
+        unit_price: 19900,
       },
     ],
     payer: {
@@ -224,7 +224,7 @@ Deno.serve(async (req: Request) => {
         user_id: user.id,
         mp_preference_id: preference.id,
         status: "pending",
-        amount: 9990,
+        amount: 19900,
         currency: "CLP",
       });
 
