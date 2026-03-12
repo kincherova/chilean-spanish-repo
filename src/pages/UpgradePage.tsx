@@ -119,6 +119,10 @@ export default function UpgradePage() {
             visual: {
               style: { theme: 'flat' },
             },
+            fields: {
+              cardholderIdentificationNumber: { visibility: 'hidden' },
+              cardholderIdentificationTypeSelect: { visibility: 'hidden' },
+            },
             paymentMethods: {
               creditCard: 'all',
               debitCard: 'all',
