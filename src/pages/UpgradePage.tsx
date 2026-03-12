@@ -70,6 +70,7 @@ export default function UpgradePage() {
 
     try {
       await loadMPScript();
+      await new Promise((r) => setTimeout(r, 50));
 
       if (!MP_PUBLIC_KEY) {
         setBrickError('Payment system is not configured. Please contact support.');
@@ -156,6 +157,7 @@ export default function UpgradePage() {
 
   useEffect(() => {
     if (step !== 'brick') return;
+    if (!brickContainerRef.current) return;
 
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -171,7 +173,7 @@ export default function UpgradePage() {
         brickMounted.current = false;
       }
     };
-  }, [step]);
+  }, [step, brickContainerRef.current]);
 
   const handleContinueToPayment = async () => {
     if (user) {
@@ -290,7 +292,7 @@ export default function UpgradePage() {
             </div>
           )}
 
-          <div ref={brickContainerRef} id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm" />
+          <div ref={brickContainerRef} id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm min-h-[200px]" />
         </div>
       </div>
     );
