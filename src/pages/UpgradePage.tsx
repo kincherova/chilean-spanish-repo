@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Star, Sparkles, KeyRound, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import NavBar from '../components/NavBar';
@@ -40,7 +40,6 @@ export default function UpgradePage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [brickError, setBrickError] = useState<string | null>(null);
 
-  const brickContainerRef = useRef<HTMLDivElement>(null);
   const brickMounted = useRef(false);
   const scriptLoaded = useRef(false);
 
@@ -70,7 +69,6 @@ export default function UpgradePage() {
 
     try {
       await loadMPScript();
-      await new Promise((r) => setTimeout(r, 50));
 
       if (!MP_PUBLIC_KEY) {
         setBrickError('Payment system is not configured. Please contact support.');
@@ -155,25 +153,22 @@ export default function UpgradePage() {
     }
   };
 
-  useEffect(() => {
-    if (step !== 'brick') return;
-    if (!brickContainerRef.current) return;
-
+  const brickContainerRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) {
+      if (window.paymentBrickController) {
+        window.paymentBrickController.unmount();
+        window.paymentBrickController = undefined;
+        brickMounted.current = false;
+      }
+      return;
+    }
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.access_token) {
         mountBrick(session.access_token);
       }
     })();
-
-    return () => {
-      if (window.paymentBrickController) {
-        window.paymentBrickController.unmount();
-        window.paymentBrickController = undefined;
-        brickMounted.current = false;
-      }
-    };
-  }, [step, brickContainerRef.current]);
+  }, []);
 
   const handleContinueToPayment = async () => {
     if (user) {
