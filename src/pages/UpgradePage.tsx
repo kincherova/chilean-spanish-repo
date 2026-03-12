@@ -103,7 +103,7 @@ export default function UpgradePage() {
         if (cancelled) return;
 
         const token = session.access_token;
-        const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
+        const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'en-US' });
         const bricksBuilder = mp.bricks();
 
         const settings = {
