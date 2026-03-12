@@ -164,6 +164,10 @@ export default function UpgradePage() {
             },
             onError: (error: unknown) => {
               console.error('Brick error:', error);
+              const msg = error && typeof error === 'object' && 'message' in error
+                ? String((error as { message: unknown }).message)
+                : JSON.stringify(error);
+              setBrickError(`Payment form error: ${msg}`);
             },
           },
         };
