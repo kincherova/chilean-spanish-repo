@@ -76,7 +76,7 @@ export default function UpgradePage() {
         return;
       }
 
-      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
+      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'en-US' });
       const bricksBuilder = mp.bricks();
 
       const settings = {
@@ -290,7 +290,7 @@ export default function UpgradePage() {
             </div>
           )}
 
-          <div ref={brickContainerRef} id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm overflow-hidden" />
+          <div ref={brickContainerRef} id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm" />
         </div>
       </div>
     );
