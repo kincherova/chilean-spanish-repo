@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Star, Sparkles, KeyRound, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import NavBar from '../components/NavBar';
@@ -20,6 +20,23 @@ type Step = 'offer' | 'auth' | 'brick' | 'result';
 type AuthMode = 'login' | 'signup';
 type PaymentStatus = 'approved' | 'pending' | 'rejected';
 
+function loadMPScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (window.MercadoPago) { resolve(); return; }
+    const existing = document.querySelector('script[src="https://sdk.mercadopago.com/js/v2"]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error('Failed to load MercadoPago SDK')));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://sdk.mercadopago.com/js/v2';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load MercadoPago SDK'));
+    document.head.appendChild(script);
+  });
+}
+
 export default function UpgradePage() {
   const { user, isPremium, refreshPremium, signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -40,135 +57,127 @@ export default function UpgradePage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [brickError, setBrickError] = useState<string | null>(null);
 
-  const brickMounted = useRef(false);
-  const scriptLoaded = useRef(false);
-
+  const brickMountedRef = useRef(false);
   const MP_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY as string;
 
-  const loadMPScript = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (window.MercadoPago) { resolve(); return; }
-      if (scriptLoaded.current) {
-        const interval = setInterval(() => {
-          if (window.MercadoPago) { clearInterval(interval); resolve(); }
-        }, 100);
-        return;
+  useEffect(() => {
+    if (step !== 'brick') return;
+
+    let cancelled = false;
+
+    const mount = async () => {
+      if (brickMountedRef.current) return;
+
+      try {
+        await loadMPScript();
+        if (cancelled) return;
+
+        if (!MP_PUBLIC_KEY) {
+          setBrickError('Payment system is not configured. Please contact support.');
+          return;
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (!session?.access_token) {
+          setBrickError('Session expired. Please sign in again.');
+          return;
+        }
+
+        const token = session.access_token;
+        brickMountedRef.current = true;
+
+        const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
+        const bricksBuilder = mp.bricks();
+
+        const settings = {
+          initialization: {
+            amount: 19900,
+            payer: {
+              firstName: '',
+              lastName: '',
+              email: user?.email ?? '',
+            },
+          },
+          customization: {
+            visual: {
+              style: { theme: 'flat' },
+            },
+            paymentMethods: {
+              creditCard: 'all',
+              debitCard: 'all',
+              ticket: 'all',
+              bankTransfer: 'all',
+              maxInstallments: 1,
+            },
+          },
+          callbacks: {
+            onReady: () => {},
+            onSubmit: ({ formData }: { selectedPaymentMethod: string; formData: object }) => {
+              return new Promise<void>((resolve, reject) => {
+                (async () => {
+                  try {
+                    const res = await fetch(
+                      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/process-payment`,
+                      {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(formData),
+                      }
+                    );
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Payment failed');
+                    const status: PaymentStatus = data.status === 'approved'
+                      ? 'approved'
+                      : data.status === 'pending'
+                      ? 'pending'
+                      : 'rejected';
+                    if (status === 'approved') await refreshPremium();
+                    setPaymentStatus(status);
+                    setStep('result');
+                    resolve();
+                  } catch (err) {
+                    setBrickError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
+                    reject();
+                  }
+                })();
+              });
+            },
+            onError: (error: unknown) => {
+              console.error('Brick error:', error);
+            },
+          },
+        };
+
+        if (cancelled) return;
+
+        window.paymentBrickController = await bricksBuilder.create(
+          'payment',
+          'paymentBrick_container',
+          settings
+        );
+      } catch (err) {
+        if (!cancelled) {
+          brickMountedRef.current = false;
+          setBrickError(err instanceof Error ? err.message : 'Failed to load payment form.');
+        }
       }
-      scriptLoaded.current = true;
-      const script = document.createElement('script');
-      script.src = 'https://sdk.mercadopago.com/js/v2';
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load MercadoPago SDK'));
-      document.head.appendChild(script);
-    });
-  };
+    };
 
-  const mountBrick = async (token: string) => {
-    if (brickMounted.current) return;
-    brickMounted.current = true;
+    mount();
 
-    try {
-      await loadMPScript();
-
-      if (!MP_PUBLIC_KEY) {
-        setBrickError('Payment system is not configured. Please contact support.');
-        return;
-      }
-
-      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-CL' });
-      const bricksBuilder = mp.bricks();
-
-      const settings = {
-        initialization: {
-          amount: 19900,
-          payer: {
-            firstName: '',
-            lastName: '',
-            email: user?.email ?? '',
-          },
-        },
-        customization: {
-          visual: {
-            style: { theme: 'flat' },
-          },
-          paymentMethods: {
-            creditCard: 'all',
-            debitCard: 'all',
-            ticket: 'all',
-            bankTransfer: 'all',
-            onboarding_credits: 'all',
-            wallet_purchase: 'all',
-            maxInstallments: 1,
-          },
-        },
-        callbacks: {
-          onReady: () => {},
-          onSubmit: ({ formData }: { selectedPaymentMethod: string; formData: object }) => {
-            return new Promise<void>((resolve, reject) => {
-              (async () => {
-                try {
-                  const res = await fetch(
-                    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/process-payment`,
-                    {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: JSON.stringify(formData),
-                    }
-                  );
-                  const data = await res.json();
-                  if (!res.ok) throw new Error(data.error || 'Payment failed');
-                  const status: PaymentStatus = data.status === 'approved'
-                    ? 'approved'
-                    : data.status === 'pending'
-                    ? 'pending'
-                    : 'rejected';
-                  if (status === 'approved') await refreshPremium();
-                  setPaymentStatus(status);
-                  setStep('result');
-                  resolve();
-                } catch (err) {
-                  setBrickError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
-                  reject();
-                }
-              })();
-            });
-          },
-          onError: (error: unknown) => {
-            console.error('Brick error:', error);
-          },
-        },
-      };
-
-      window.paymentBrickController = await bricksBuilder.create(
-        'payment',
-        'paymentBrick_container',
-        settings
-      );
-    } catch (err) {
-      brickMounted.current = false;
-      setBrickError(err instanceof Error ? err.message : 'Failed to load payment form.');
-    }
-  };
-
-  const brickContainerRef = useCallback((node: HTMLDivElement | null) => {
-    if (!node) {
+    return () => {
+      cancelled = true;
       if (window.paymentBrickController) {
         window.paymentBrickController.unmount();
         window.paymentBrickController = undefined;
-        brickMounted.current = false;
       }
-      return;
-    }
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        mountBrick(session.access_token);
-      }
-    })();
-  }, []);
+      brickMountedRef.current = false;
+    };
+  }, [step]);
 
   const handleContinueToPayment = async () => {
     if (user) {
@@ -287,7 +296,7 @@ export default function UpgradePage() {
             </div>
           )}
 
-          <div ref={brickContainerRef} id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm min-h-[200px]" />
+          <div id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm min-h-[200px]" />
         </div>
       </div>
     );
