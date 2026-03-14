@@ -458,7 +458,7 @@ export default function UpgradePage() {
                   placeholder="••••••••"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy/40 transition-colors"
                   required
-                  minLength={6}
+                  minLength={4}
                 />
               </div>
 
@@ -562,7 +562,7 @@ export default function UpgradePage() {
                   placeholder="••••••••"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy/40 transition-colors"
                   required
-                  minLength={6}
+                  minLength={4}
                 />
               </div>
               {authError && (

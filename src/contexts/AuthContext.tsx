@@ -58,16 +58,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (!error && data.user) {
-      await supabase.from('user_profiles').upsert({
-        id: data.user.id,
-        name,
-        email,
-        onboarding_completed: false,
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/signup`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ email, password, name }),
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) {
+      return { error: new Error(data.error || 'Sign up failed') };
+    }
+    if (data.session) {
+      await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
       });
     }
-    return { error };
+    return { error: null };
   };
 
   const refreshPremium = async () => {

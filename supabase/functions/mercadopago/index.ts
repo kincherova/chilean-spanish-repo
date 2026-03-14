@@ -301,6 +301,95 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    if (path === "/signup" || path === "/signup/") {
+      const body = await req.json().catch(() => ({}));
+      const { email, password, name } = body;
+
+      if (!email || !password || !name) {
+        return new Response(JSON.stringify({ error: "email, password, and name are required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (password.length < 4) {
+        return new Response(JSON.stringify({ error: "Password must be at least 4 characters" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const admin = supabaseAdmin();
+
+      const { data: createData, error: createError } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { name },
+      });
+
+      if (createError) {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const newUser = createData.user;
+
+      await admin.from("user_profiles").upsert({
+        id: newUser.id,
+        name,
+        email,
+        onboarding_completed: false,
+      });
+
+      const { data: signInData, error: signInError } = await admin.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+      });
+
+      if (signInError || !signInData?.properties?.hashed_token) {
+        const { data: sessionData, error: sessionError } = await createClient(
+          SUPABASE_URL,
+          Deno.env.get("SUPABASE_ANON_KEY")!
+        ).auth.signInWithPassword({ email, password });
+
+        if (sessionError || !sessionData.session) {
+          return new Response(JSON.stringify({
+            success: true,
+            user_id: newUser.id,
+            session: null,
+          }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          user_id: newUser.id,
+          session: sessionData.session,
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const { data: sessionData, error: sessionError } = await createClient(
+        SUPABASE_URL,
+        Deno.env.get("SUPABASE_ANON_KEY")!
+      ).auth.signInWithPassword({ email, password });
+
+      if (sessionError || !sessionData.session) {
+        return new Response(JSON.stringify({
+          success: true,
+          user_id: newUser.id,
+          session: null,
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        user_id: newUser.id,
+        session: sessionData.session,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     if (path === "/redeem-code" || path === "/redeem-code/") {
       const authHeader = req.headers.get("Authorization");
       if (!authHeader) {

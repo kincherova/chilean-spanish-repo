@@ -81,7 +81,7 @@ export default function LoginPage() {
               placeholder="••••••••"
               className="w-full bg-white/10 border border-white/20 rounded-card px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-coral transition-colors"
               required
-              minLength={6}
+              minLength={4}
             />
           </div>
 
