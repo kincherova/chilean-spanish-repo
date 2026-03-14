@@ -326,7 +326,12 @@ export default function UpgradePage() {
         setAuthLoading(false);
         return;
       }
-      await refreshPremium();
+      let userId: string | undefined;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userId = payload.sub;
+      } catch { /* ignore */ }
+      await refreshPremium(userId);
       setAuthLoading(false);
       navigate('/modules');
     } catch {

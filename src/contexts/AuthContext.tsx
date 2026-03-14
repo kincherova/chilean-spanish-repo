@@ -10,7 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null; accessToken?: string }>;
   signOut: () => Promise<void>;
-  refreshPremium: () => Promise<void>;
+  refreshPremium: (userId?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -83,8 +83,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   };
 
-  const refreshPremium = async () => {
-    if (user) await fetchPremiumStatus(user.id);
+  const refreshPremium = async (userId?: string) => {
+    const id = userId ?? user?.id;
+    if (id) {
+      await fetchPremiumStatus(id);
+    } else {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) await fetchPremiumStatus(session.user.id);
+    }
   };
 
   const signOut = async () => {
