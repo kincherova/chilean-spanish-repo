@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Volume2, BookOpen, Zap } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
+import { playAudio } from '../lib/audio';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { fs } from '../components/lesson/fontSizeClasses';
@@ -82,10 +83,6 @@ export default function VocabularyPage() {
     load();
   }, [user]);
 
-  const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play().catch(() => {});
-  };
 
   const removeTag = async (cardId: string) => {
     if (!user) return;

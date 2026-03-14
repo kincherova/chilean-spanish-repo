@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Volume2, CheckCircle2, XCircle, ChevronRight, Play, SkipForward } from 'lucide-react';
 import { AudioChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
+import { playAudio as playSharedAudio, stopAudio } from '../../lib/audio';
 
 interface Props {
   page: AudioChoicePage;
@@ -24,12 +25,11 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
   const playAudio = () => {
     if (!item.audioUrl) return;
     setPlaying(true);
-    const audio = new Audio(item.audioUrl);
-    audio.play().catch(() => {});
-    audio.onended = () => setPlaying(false);
+    playSharedAudio(item.audioUrl, () => setPlaying(false));
   };
 
   const advanceItem = () => {
+    stopAudio();
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
       setWrongGuesses(new Set());

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Volume2, CheckCircle2, XCircle, ChevronRight, SkipForward } from 'lucide-react';
 import { MultipleChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
+import { playAudio } from '../../lib/audio';
 
 interface Props {
   page: MultipleChoicePage;
@@ -20,10 +21,6 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
   const item = page.items[currentItem];
 
-  const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play().catch(() => {});
-  };
 
   const advanceItem = () => {
     if (currentItem < page.items.length - 1) {

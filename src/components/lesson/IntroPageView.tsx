@@ -1,6 +1,7 @@
 import { Volume2 } from 'lucide-react';
 import { IntroPage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
+import { playAudio } from '../../lib/audio';
 
 interface Props {
   page: IntroPage;
@@ -8,10 +9,6 @@ interface Props {
 }
 
 export default function IntroPageView({ page, fontSize }: Props) {
-  const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play().catch(() => {});
-  };
 
   return (
     <div>

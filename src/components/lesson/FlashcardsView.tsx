@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Flashcard } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
+import { playAudio } from '../../lib/audio';
 
 interface Props {
   flashcards: Flashcard[];
@@ -15,10 +16,6 @@ export default function FlashcardsView({ flashcards, fontSize }: Props) {
 
   const card = flashcards[currentIndex];
 
-  const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play().catch(() => {});
-  };
 
   if (flashcards.length === 0) {
     return (

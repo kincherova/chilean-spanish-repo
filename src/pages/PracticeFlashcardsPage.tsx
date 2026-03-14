@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
+import { playAudio } from '../lib/audio';
 import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -55,10 +56,6 @@ export default function PracticeFlashcardsPage() {
 
   const card = flashcards[currentIndex];
 
-  const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play().catch(() => {});
-  };
 
   const setTag = async (tag: UserFlashcardTag['tag'] | null) => {
     if (!user || !card) return;
