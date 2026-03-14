@@ -297,10 +297,14 @@ export default function UpgradePage() {
     if (!accessCode.trim()) { setCodeError('Please enter your access code'); return; }
     setAuthLoading(true);
     try {
-      const { error: signUpError } = await signUp(authEmail, authPassword, authName);
+      const { error: signUpError, accessToken } = await signUp(authEmail, authPassword, authName);
       if (signUpError) { setAuthError(signUpError.message); setAuthLoading(false); return; }
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
+      let token = accessToken;
+      if (!token) {
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
+      }
+      if (!token) {
         setAuthError('Account created but could not establish session. Please sign in and try the code again.');
         setAuthLoading(false);
         return;
@@ -311,7 +315,7 @@ export default function UpgradePage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ code: accessCode.trim() }),
         }

@@ -8,7 +8,7 @@ interface AuthContextType {
   loading: boolean;
   isPremium: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null; accessToken?: string }>;
   signOut: () => Promise<void>;
   refreshPremium: () => Promise<void>;
 }
@@ -78,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
       });
+      return { error: null, accessToken: data.session.access_token };
     }
     return { error: null };
   };
