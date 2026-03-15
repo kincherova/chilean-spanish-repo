@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Sparkles, KeyRound, X } from 'lucide-react';
+import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Sparkles, KeyRound, X, MessageCircle } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -283,6 +283,26 @@ export default function ProfilePage() {
             <span className="font-medium text-sm">Sign out</span>
           </button>
         </div>
+
+        <Link
+          to="/about-irina"
+          className="mt-6 mb-2 flex items-center gap-4 bg-white rounded-card-lg px-5 py-4 shadow-sm hover:shadow-md transition-shadow group"
+        >
+          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-coral/20">
+            <img
+              src="/20000101000140_IMG_0882_copy.JPG"
+              alt="Irina"
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-navy text-sm">Meet Irina, creator of the app</p>
+            <p className="text-muted text-xs mt-0.5 truncate">Language teacher &amp; Chile expert</p>
+          </div>
+          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-coral/10 flex items-center justify-center group-hover:bg-coral/20 transition-colors">
+            <MessageCircle size={14} className="text-coral" />
+          </div>
+        </Link>
       </div>
     </div>
   );
