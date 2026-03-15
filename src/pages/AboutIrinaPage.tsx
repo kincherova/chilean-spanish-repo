@@ -14,7 +14,7 @@ export default function AboutIrinaPage() {
               className="w-full h-full object-cover object-top"
             />
           </div>
-          <h1 className="font-display text-2xl font-bold text-navy text-center">Irina</h1>
+          <h1 className="font-display text-2xl font-bold text-navy text-center">Irina Kincherova</h1>
           <p className="text-muted text-sm mt-1">Language Teacher &amp; Creator</p>
         </div>
 
@@ -24,7 +24,7 @@ export default function AboutIrinaPage() {
             Irina is an experienced language teacher who has been living in Chile for the past 10 years.
           </p>
           <p className="text-navy text-[15px] leading-relaxed mb-4">
-            She knows how difficult it can be to understand locals — the Chilean accent is very different from other Spanish accents, and even intermediate Spanish speakers can feel completely lost when talking to Chileans.
+            She knows how difficult it can be to understand locals — the Chilean accent is very different from other Spanish accents, and even those who have learned Spanish can feel completely lost when talking to Chileans.
           </p>
           <p className="text-navy text-[15px] leading-relaxed">
             That is why she created this app — so that foreigners who come to visit this beautiful country have the opportunity to communicate with locals and truly understand them.
@@ -38,7 +38,6 @@ export default function AboutIrinaPage() {
           <Mail size={18} />
           Contact Irina
         </a>
-        <p className="text-center text-muted text-xs mt-3">kincherova@gmail.com</p>
       </div>
     </div>
   );
