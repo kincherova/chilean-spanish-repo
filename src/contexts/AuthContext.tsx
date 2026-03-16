@@ -32,12 +32,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    let resolved = false;
     const resolve = () => {
-      if (!initialised.current) {
+      if (!resolved) {
+        resolved = true;
         initialised.current = true;
         setLoading(false);
       }
     };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchPremiumStatus(session.user.id).then(resolve);
+      } else {
+        setIsPremium(false);
+        resolve();
+      }
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -82,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!res.ok) {
       return { error: new Error(data.error || 'Sign up failed') };
     }
+    await supabase.auth.signOut({ scope: 'local' });
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {
       return { error: signInError };
@@ -90,12 +104,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshPremium = async (userId?: string) => {
-    const id = userId ?? user?.id;
+    const { data: { session } } = await supabase.auth.getSession();
+    const id = userId ?? session?.user?.id ?? user?.id;
     if (id) {
       await fetchPremiumStatus(id);
-    } else {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) await fetchPremiumStatus(session.user.id);
     }
   };
 
