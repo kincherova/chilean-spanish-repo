@@ -23,6 +23,7 @@ export default function FlashcardsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showGuestToast, setShowGuestToast] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -59,7 +60,12 @@ export default function FlashcardsPage() {
 
 
   const setTag = async (tag: UserFlashcardTag['tag'] | null) => {
-    if (!user || !card) return;
+    if (!user) {
+      setShowGuestToast(true);
+      setTimeout(() => setShowGuestToast(false), 2500);
+      return;
+    }
+    if (!card) return;
     if (tag === null) {
       await supabase.from('user_flashcard_tags').delete().eq('user_id', user.id).eq('flashcard_id', card.id);
       const updated = { ...tags };
@@ -145,6 +151,13 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen bg-warm-bg">
       <NavBar back={`/modules/${moduleId}/units/${unitId}`} title="Flashcards" />
+      <div
+        className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-navy text-white text-sm font-medium rounded-full shadow-lg transition-all duration-300 whitespace-nowrap ${
+          showGuestToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+        }`}
+      >
+        Register to mark the phrase
+      </div>
       <div className="max-w-sm mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 text-sm text-muted">
           <span>{currentIndex + 1} / {flashcards.length}</span>
