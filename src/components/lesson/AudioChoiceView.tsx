@@ -3,6 +3,7 @@ import { Volume2, CheckCircle2, XCircle, ChevronRight, Play, SkipForward } from 
 import { AudioChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
 import { playAudio as playSharedAudio, stopAudio } from '../../lib/audio';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Props {
   page: AudioChoicePage;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, onNext }: Props) {
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.name?.split(' ')[0] ?? '';
   const [currentItem, setCurrentItem] = useState(0);
   const [wrongGuesses, setWrongGuesses] = useState<Set<number>>(new Set());
   const [correctlyAnswered, setCorrectlyAnswered] = useState(false);
@@ -65,8 +68,8 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <CheckCircle2 size={48} className="text-green-500 mb-4" />
-        <h2 className="font-display text-2xl font-bold text-navy mb-2">Section complete!</h2>
-        <p className="text-muted mb-6">Continue to the next part.</p>
+        <h2 className="font-display text-2xl font-bold text-navy mb-2">¡Muy bien{userName ? `, ${userName}` : ''}!</h2>
+        <p className="text-muted mb-6">Keep going!</p>
         <button
           onClick={onNext}
           className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
