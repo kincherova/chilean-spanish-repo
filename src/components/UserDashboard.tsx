@@ -9,13 +9,14 @@ const TOTAL_UNITS = 28;
 
 interface DashboardStats {
   masteredCount: number;
+  totalPhrases: number;
   loading: boolean;
 }
 
 export default function UserDashboard() {
   const { user } = useAuth();
   const { completedLessons } = useProgress();
-  const [stats, setStats] = useState<DashboardStats>({ masteredCount: 0, loading: true });
+  const [stats, setStats] = useState<DashboardStats>({ masteredCount: 0, totalPhrases: 0, loading: true });
 
   const completedUnits = completedLessons.size;
 
@@ -23,13 +24,18 @@ export default function UserDashboard() {
     if (!user) return;
 
     async function fetchMastered() {
-      const { count } = await supabase
-        .from('user_flashcard_tags')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user!.id)
-        .eq('tag', 'mastered');
+      const [{ count: masteredCount }, { count: totalPhrases }] = await Promise.all([
+        supabase
+          .from('user_flashcard_tags')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user!.id)
+          .eq('tag', 'mastered'),
+        supabase
+          .from('flashcards')
+          .select('*', { count: 'exact', head: true }),
+      ]);
 
-      setStats({ masteredCount: count ?? 0, loading: false });
+      setStats({ masteredCount: masteredCount ?? 0, totalPhrases: totalPhrases ?? 0, loading: false });
     }
 
     fetchMastered();
@@ -37,6 +43,7 @@ export default function UserDashboard() {
 
   const firstName = user?.user_metadata?.name?.split(' ')[0] ?? null;
   const progressPercent = Math.round((completedUnits / TOTAL_UNITS) * 100);
+  const phrasesPercent = stats.totalPhrases > 0 ? Math.round((stats.masteredCount / stats.totalPhrases) * 100) : 0;
 
   return (
     <div className="w-full max-w-md mx-auto text-center">
@@ -66,8 +73,16 @@ export default function UserDashboard() {
           ) : (
             <div className="text-5xl font-bold text-white mb-1">{stats.masteredCount}</div>
           )}
-          <div className="text-white/40 text-xs uppercase tracking-widest">phrases</div>
-          <div className="text-white/30 text-xs mt-2.5 leading-snug">mastered</div>
+          <div className="text-white/40 text-xs uppercase tracking-widest">
+            of {stats.loading ? '—' : stats.totalPhrases} phrases
+          </div>
+          <div className="mt-3 w-24 mx-auto h-1 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-teal rounded-full transition-all duration-700"
+              style={{ width: `${phrasesPercent}%` }}
+            />
+          </div>
+          <div className="text-white/30 text-xs mt-1.5">mastered</div>
         </div>
       </div>
 
