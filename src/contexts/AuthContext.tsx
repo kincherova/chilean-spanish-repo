@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const initialised = useRef(false);
 
   async function fetchPremiumStatus(userId: string) {
     const { data } = await supabase
@@ -31,25 +32,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchPremiumStatus(session.user.id);
-      setLoading(false);
-    });
+    const resolve = () => {
+      if (!initialised.current) {
+        initialised.current = true;
+        setLoading(false);
+      }
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        (async () => { await fetchPremiumStatus(session.user.id); })();
+        (async () => {
+          await fetchPremiumStatus(session.user.id);
+          resolve();
+        })();
       } else {
         setIsPremium(false);
+        resolve();
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    const fallback = setTimeout(resolve, 5000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(fallback);
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
