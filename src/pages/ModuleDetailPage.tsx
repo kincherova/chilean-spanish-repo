@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Clock, ChevronRight, CheckCircle2, BookOpen, Layers } from 'lucide-react';
+import { Clock, ChevronRight, CheckCircle2, Layers } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
@@ -94,13 +94,6 @@ export default function ModuleDetailPage() {
               <div className={`flex items-center gap-2 mt-1.5 text-muted ${fs.label(fontSize)}`}>
                 <Clock size={11} />
                 <span>{unit.estimated_minutes} min</span>
-                {unit.lessons.length > 0 && (
-                  <>
-                    <span>·</span>
-                    <BookOpen size={11} />
-                    <span>{unit.lessons.length} lesson{unit.lessons.length !== 1 ? 's' : ''}</span>
-                  </>
-                )}
               </div>
             </div>
           </div>
