@@ -21,13 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const initialised = useRef(false);
+  const premiumFetchIdRef = useRef(0);
 
   async function fetchPremiumStatus(userId: string): Promise<boolean> {
+    const fetchId = ++premiumFetchIdRef.current;
     const { data } = await supabase
       .from('user_profiles')
       .select('is_premium')
       .eq('id', userId)
       .maybeSingle();
+    if (fetchId !== premiumFetchIdRef.current) return false;
     const premium = data?.is_premium ?? false;
     setIsPremium(premium);
     return premium;
@@ -43,35 +46,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-      if (error || !session) {
-        await supabase.auth.signOut({ scope: 'local' });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
         setSession(null);
         setUser(null);
         setIsPremium(false);
         resolve();
-        return;
       }
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('is_premium')
-        .eq('id', session.user.id)
-        .maybeSingle();
-      if (!profile) {
-        await supabase.auth.signOut({ scope: 'local' });
-        setSession(null);
-        setUser(null);
-        setIsPremium(false);
-        resolve();
-        return;
-      }
-      setSession(session);
-      setUser(session.user);
-      setIsPremium(profile.is_premium ?? false);
-      resolve();
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -80,7 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           resolve();
         })();
       } else {
-        setIsPremium(false);
+        if (event !== 'TOKEN_REFRESHED') {
+          setIsPremium(false);
+        }
         resolve();
       }
     });
