@@ -103,6 +103,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!res.ok) {
       return { error: new Error(data.error || 'Sign up failed') };
     }
+    if (data.session?.access_token && data.session?.refresh_token) {
+      await supabase.auth.signOut({ scope: 'local' });
+      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      if (sessionError) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) return { error: signInError };
+        return { error: null, accessToken: signInData.session?.access_token };
+      }
+      return { error: null, accessToken: sessionData.session?.access_token };
+    }
     await supabase.auth.signOut({ scope: 'local' });
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {

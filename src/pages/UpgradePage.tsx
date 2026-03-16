@@ -42,7 +42,7 @@ function loadMPScript(): Promise<void> {
 }
 
 export default function UpgradePage() {
-  const { user, isPremium, refreshPremium, signIn, signUp } = useAuth();
+  const { user, isPremium, refreshPremium, signIn, signUp, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>('offer');
@@ -340,7 +340,7 @@ export default function UpgradePage() {
     }
   };
 
-  if (isPremium) {
+  if (isPremium && step === 'offer') {
     return (
       <div className="min-h-screen bg-warm-bg">
         <NavBar back="/modules" title="Full Access" />
@@ -353,6 +353,17 @@ export default function UpgradePage() {
           <button onClick={() => navigate('/modules')} className="px-6 py-3 rounded-full bg-navy text-white font-semibold text-sm hover:bg-navy/90 transition-colors">
             Go to modules
           </button>
+          <div className="mt-6">
+            <button
+              onClick={async () => {
+                await signOut();
+                setStep('offer');
+              }}
+              className="text-sm text-muted hover:text-navy transition-colors underline underline-offset-2"
+            >
+              Sign out and use a different account
+            </button>
+          </div>
         </div>
       </div>
     );
