@@ -455,10 +455,16 @@ Deno.serve(async (req: Request) => {
         .update({ use_count: codeRow.use_count + 1 })
         .eq("id", codeRow.id);
 
+      const userName = (user.user_metadata?.name as string) || (user.email?.split("@")[0] ?? "User");
       await admin
         .from("user_profiles")
-        .update({ is_premium: true })
-        .eq("id", user.id);
+        .upsert({
+          id: user.id,
+          name: userName,
+          email: user.email ?? "",
+          is_premium: true,
+          onboarding_completed: false,
+        }, { onConflict: "id" });
 
       return new Response(
         JSON.stringify({ success: true }),
