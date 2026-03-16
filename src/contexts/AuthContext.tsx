@@ -21,18 +21,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const initialised = useRef(false);
-  const premiumFetchIdRef = useRef(0);
+  const isPremiumRef = useRef(false);
+
+  const safetSetIsPremium = (value: boolean) => {
+    isPremiumRef.current = value;
+    setIsPremium(value);
+  };
 
   async function fetchPremiumStatus(userId: string): Promise<boolean> {
-    const fetchId = ++premiumFetchIdRef.current;
     const { data } = await supabase
       .from('user_profiles')
       .select('is_premium')
       .eq('id', userId)
       .maybeSingle();
-    if (fetchId !== premiumFetchIdRef.current) return false;
     const premium = data?.is_premium ?? false;
-    setIsPremium(premium);
+    if (premium || !isPremiumRef.current) {
+      safetSetIsPremium(premium);
+    }
     return premium;
   }
 
@@ -50,12 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!session) {
         setSession(null);
         setUser(null);
-        setIsPremium(false);
+        safetSetIsPremium(false);
         resolve();
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -64,9 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           resolve();
         })();
       } else {
-        if (event !== 'TOKEN_REFRESHED') {
-          setIsPremium(false);
-        }
+        safetSetIsPremium(false);
         resolve();
       }
     });
@@ -112,7 +115,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { session } } = await supabase.auth.getSession();
     const id = userId ?? session?.user?.id ?? user?.id;
     if (id) {
-      await fetchPremiumStatus(id);
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('is_premium')
+        .eq('id', id)
+        .maybeSingle();
+      const premium = data?.is_premium ?? false;
+      safetSetIsPremium(premium);
     }
   };
 
