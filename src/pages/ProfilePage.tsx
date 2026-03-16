@@ -284,25 +284,27 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        <Link
-          to="/about-irina"
-          className="mt-6 mb-2 flex items-center gap-4 bg-white rounded-card-lg px-5 py-4 shadow-sm hover:shadow-md transition-shadow group"
-        >
-          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-coral/20">
-            <img
-              src="/20000101000140_IMG_0882_copy.JPG"
-              alt="Irina"
-              className="w-full h-full object-cover object-top"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-navy text-sm">Meet Irina, creator of the app</p>
-            <p className="text-muted text-xs mt-0.5 truncate">Language teacher &amp; Chile expert</p>
-          </div>
-          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-coral/10 flex items-center justify-center group-hover:bg-coral/20 transition-colors">
-            <MessageCircle size={14} className="text-coral" />
-          </div>
-        </Link>
+        <div className="flex justify-center mt-6 mb-2">
+          <Link
+            to="/about-irina"
+            className="inline-flex items-center gap-3 bg-green-50/80 border border-green-200 rounded-card-lg px-4 py-3 hover:bg-green-100/80 transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-green-200">
+              <img
+                src="/20000101000140_IMG_0882_copy.JPG"
+                alt="Irina"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-green-900 text-sm">Meet Irina, creator of the app</p>
+              <p className="text-green-700 text-xs mt-0.5">Language teacher in Chile</p>
+            </div>
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-200/60 flex items-center justify-center group-hover:bg-green-200 transition-colors">
+              <MessageCircle size={12} className="text-green-700" />
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
