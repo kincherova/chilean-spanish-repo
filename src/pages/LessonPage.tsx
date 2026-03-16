@@ -23,7 +23,7 @@ const FONT_SIZE_LABELS: Record<string, string> = {
 export default function LessonPage() {
   const { moduleId, unitId, lessonId } = useParams<{ moduleId: string; unitId: string; lessonId: string }>();
   const navigate = useNavigate();
-  const { markLessonComplete, isLessonComplete } = useProgress();
+  const { markLessonComplete } = useProgress();
   const { fontSize, cycleFontSize } = useFontSize();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -159,12 +159,12 @@ export default function LessonPage() {
             <DialoguePracticeView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'recap' && (
-            <RecapView page={page} lessonTitle={lesson.title} isComplete={isLessonComplete(lesson.id)} fontSize={fontSize} />
+            <RecapView page={page} lessonTitle={lesson.title} fontSize={fontSize} />
           )}
         </div>
 
         {page?.type !== 'multiple_choice' && page?.type !== 'audio_choice' && (
-          <div className="pt-6">
+          <div className="pt-6 flex flex-col gap-3">
             <button
               onClick={handleNext}
               className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
@@ -181,6 +181,14 @@ export default function LessonPage() {
                 </>
               )}
             </button>
+            {page?.type === 'recap' && (
+              <button
+                onClick={() => navigate(`/modules/${moduleId}`)}
+                className="w-full flex items-center justify-center gap-2 border border-navy/20 text-navy hover:bg-navy/5 font-semibold py-3.5 rounded-card transition-colors"
+              >
+                Back to lessons
+              </button>
+            )}
           </div>
         )}
       </div>

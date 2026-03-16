@@ -6,11 +6,10 @@ import DialogueView from './DialogueView';
 interface Props {
   page: RecapPage;
   lessonTitle: string;
-  isComplete: boolean;
   fontSize: FontSize;
 }
 
-export default function RecapView({ page, lessonTitle, isComplete, fontSize }: Props) {
+export default function RecapView({ page, lessonTitle, fontSize }: Props) {
   if (page.dialogue && page.dialogue.length > 0) {
     return (
       <div>
@@ -36,7 +35,6 @@ export default function RecapView({ page, lessonTitle, isComplete, fontSize }: P
       <h1 className="font-display text-2xl font-bold text-navy mb-2">{page.title}</h1>
       <p className="text-muted text-sm max-w-xs">
         You've completed the <strong>{lessonTitle}</strong> lesson.
-        {isComplete ? " It's already marked as complete." : " Hit Continue to mark it done."}
       </p>
     </div>
   );
