@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Star, Brain } from 'lucide-react';
+import { ArrowRight, Brain } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
@@ -35,83 +35,69 @@ export default function UserDashboard() {
     fetchMastered();
   }, [user]);
 
-  const firstName = user?.user_metadata?.name?.split(' ')[0] ?? 'back';
+  const firstName = user?.user_metadata?.name?.split(' ')[0] ?? null;
   const progressPercent = Math.round((completedUnits / TOTAL_UNITS) * 100);
 
   return (
-    <div className="w-full max-w-lg mx-auto px-4 pt-8 pb-6">
-      <div className="bg-white/10 border border-white/20 rounded-2xl p-6 backdrop-blur-sm">
-        <div className="mb-5">
-          <h2 className="text-2xl font-bold text-white leading-snug">
-            Welcome back{firstName !== 'back' ? `, ${firstName}` : ''}!
-          </h2>
-          <p className="text-white/50 text-sm mt-1">Keep up the great work</p>
+    <div className="w-full max-w-md mx-auto text-center">
+      <h2 className="text-3xl font-bold text-white mb-1">
+        Welcome back{firstName ? `, ${firstName}` : ''}!
+      </h2>
+      <p className="text-white/40 text-base mb-10">Here's where you left off</p>
+
+      <div className="flex justify-center gap-12 mb-10">
+        <div className="text-center">
+          <div className="text-5xl font-bold text-white mb-1">{completedUnits}</div>
+          <div className="text-white/40 text-xs uppercase tracking-widest">of {TOTAL_UNITS} units</div>
+          <div className="mt-3 w-24 mx-auto h-1 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-teal rounded-full transition-all duration-700"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="text-white/30 text-xs mt-1.5">completed</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          <div className="bg-white/10 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle size={16} className="text-teal flex-shrink-0" />
-              <span className="text-white/60 text-xs font-medium uppercase tracking-wide">Units done</span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-white">{completedUnits}</span>
-              <span className="text-white/40 text-sm">/ {TOTAL_UNITS}</span>
-            </div>
-            <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-teal rounded-full transition-all duration-700"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="text-white/30 text-xs mt-1">{progressPercent}% complete</p>
-          </div>
+        <div className="w-px bg-white/10 self-stretch" />
 
-          <div className="bg-white/10 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Star size={16} className="text-gold flex-shrink-0" />
-              <span className="text-white/60 text-xs font-medium uppercase tracking-wide">Mastered</span>
-            </div>
-            {stats.loading ? (
-              <div className="h-9 w-12 bg-white/10 animate-pulse rounded-lg mt-1" />
-            ) : (
-              <>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-white">{stats.masteredCount}</span>
-                  <span className="text-white/40 text-sm">phrase{stats.masteredCount !== 1 ? 's' : ''}</span>
-                </div>
-                <p className="text-white/30 text-xs mt-2 leading-snug">marked as mastered</p>
-              </>
-            )}
-          </div>
+        <div className="text-center">
+          {stats.loading ? (
+            <div className="h-12 w-12 mx-auto bg-white/10 animate-pulse rounded-lg mb-1" />
+          ) : (
+            <div className="text-5xl font-bold text-white mb-1">{stats.masteredCount}</div>
+          )}
+          <div className="text-white/40 text-xs uppercase tracking-widest">phrases</div>
+          <div className="text-white/30 text-xs mt-2.5 leading-snug">mastered</div>
         </div>
-
-        <Link
-          to="/modules"
-          className="flex items-center justify-center gap-2 w-full bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-xl transition-all hover:gap-3 text-base mb-3"
-        >
-          Continue learning <ArrowRight size={18} />
-        </Link>
-
-        {!stats.loading && stats.masteredCount > 0 && (
-          <Link
-            to="/vocabulary/practice"
-            className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white font-medium py-3 rounded-xl transition-all text-sm"
-          >
-            <Brain size={16} />
-            Test your mastered phrases
-          </Link>
-        )}
-        {!stats.loading && stats.masteredCount === 0 && (
-          <Link
-            to="/vocabulary"
-            className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white/50 hover:text-white/80 font-medium py-3 rounded-xl transition-all text-sm"
-          >
-            <Brain size={16} />
-            Mark phrases as mastered to review them
-          </Link>
-        )}
       </div>
+
+      <Link
+        to="/modules"
+        className="inline-flex items-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold px-8 py-4 rounded-full text-base transition-all hover:gap-3 mb-4"
+      >
+        Continue learning <ArrowRight size={18} />
+      </Link>
+
+      <div className="h-4" />
+
+      {!stats.loading && stats.masteredCount > 0 && (
+        <Link
+          to="/vocabulary/practice"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 font-medium text-sm transition-colors"
+        >
+          <Brain size={15} />
+          Test your mastered phrases
+        </Link>
+      )}
+      {!stats.loading && stats.masteredCount === 0 && (
+        <Link
+          to="/vocabulary"
+          className="inline-flex items-center gap-2 text-white/30 hover:text-white/50 font-medium text-sm transition-colors"
+        >
+          <Brain size={15} />
+          Mark phrases as mastered to review them
+        </Link>
+      )}
     </div>
   );
 }

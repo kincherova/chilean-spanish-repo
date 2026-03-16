@@ -63,11 +63,7 @@ export default function HomePage() {
       )}
 
       {user ? (
-        <section className="max-w-3xl mx-auto px-6 pt-10 pb-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6">
-            <Plane size={14} className="text-white" />
-            <span className="text-white text-sm font-medium">Survival Chilean Spanish</span>
-          </div>
+        <section className="max-w-3xl mx-auto px-6 pt-20 pb-20">
           <UserDashboard />
         </section>
       ) : (
