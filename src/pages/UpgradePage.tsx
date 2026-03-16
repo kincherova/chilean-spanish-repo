@@ -42,7 +42,7 @@ function loadMPScript(): Promise<void> {
 }
 
 export default function UpgradePage() {
-  const { user, isPremium, refreshPremium, signIn, signUp, signOut } = useAuth();
+  const { user, isPremium, refreshPremium, grantPremium, signIn, signUp, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>('offer');
@@ -282,7 +282,7 @@ export default function UpgradePage() {
       );
       const data = await res.json();
       if (!res.ok) { setCodeError(data.error || 'Invalid access code. Please try again.'); return; }
-      await refreshPremium();
+      grantPremium();
       navigate('/modules');
     } catch {
       setCodeError('Something went wrong. Please try again.');
@@ -326,12 +326,7 @@ export default function UpgradePage() {
         setAuthLoading(false);
         return;
       }
-      let userId: string | undefined;
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        userId = payload.sub;
-      } catch { /* ignore */ }
-      await refreshPremium(userId);
+      grantPremium();
       setAuthLoading(false);
       navigate('/modules');
     } catch {

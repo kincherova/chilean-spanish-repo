@@ -11,6 +11,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null; accessToken?: string }>;
   signOut: () => Promise<void>;
   refreshPremium: (userId?: string) => Promise<void>;
+  grantPremium: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -111,15 +112,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { session } } = await supabase.auth.getSession();
     const id = userId ?? session?.user?.id ?? user?.id;
     if (id) {
-      premiumFetchGen.current++;
       const { data } = await supabase
         .from('user_profiles')
         .select('is_premium')
         .eq('id', id)
         .maybeSingle();
-      premiumFetchGen.current++;
+      premiumFetchGen.current = premiumFetchGen.current + 1000;
       setIsPremium(data?.is_premium ?? false);
     }
+  };
+
+  const grantPremium = () => {
+    premiumFetchGen.current = premiumFetchGen.current + 1000;
+    setIsPremium(true);
   };
 
   const signOut = async () => {
@@ -127,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isPremium, signIn, signUp, signOut, refreshPremium }}>
+    <AuthContext.Provider value={{ user, session, loading, isPremium, signIn, signUp, signOut, refreshPremium, grantPremium }}>
       {children}
     </AuthContext.Provider>
   );
