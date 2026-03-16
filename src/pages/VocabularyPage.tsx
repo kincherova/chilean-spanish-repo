@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, BookOpen, Zap } from 'lucide-react';
+import { Volume2, BookOpen, Zap, BrainCircuit } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { playAudio } from '../lib/audio';
@@ -199,6 +199,17 @@ export default function VocabularyPage() {
                 >
                   <Zap size={17} />
                   Let's practice them
+                </button>
+              </div>
+            )}
+            {tab === 'mastered' && (
+              <div className="mt-6">
+                <button
+                  onClick={() => navigate('/vocabulary/practice')}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-card-lg transition-colors shadow-sm"
+                >
+                  <BrainCircuit size={17} />
+                  Test your memory
                 </button>
               </div>
             )}
