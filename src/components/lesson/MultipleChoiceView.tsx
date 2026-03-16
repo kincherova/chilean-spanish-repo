@@ -101,7 +101,7 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
         <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
       </div>
 
-      <div className="space-y-2 mb-4">
+      <div key={currentItem} className="space-y-2 mb-4">
         {item.options.map((opt, idx) => {
           const isWrong = wrongGuesses.has(idx);
           const isCorrect = correctlyAnswered && idx === item.correctAnswer;
