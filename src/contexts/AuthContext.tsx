@@ -21,23 +21,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const initialised = useRef(false);
-  const isPremiumRef = useRef(false);
-
-  const safetSetIsPremium = (value: boolean) => {
-    isPremiumRef.current = value;
-    setIsPremium(value);
-  };
+  const premiumFetchGen = useRef(0);
 
   async function fetchPremiumStatus(userId: string): Promise<boolean> {
+    const gen = ++premiumFetchGen.current;
     const { data } = await supabase
       .from('user_profiles')
       .select('is_premium')
       .eq('id', userId)
       .maybeSingle();
+    if (gen !== premiumFetchGen.current) return data?.is_premium ?? false;
     const premium = data?.is_premium ?? false;
-    if (premium || !isPremiumRef.current) {
-      safetSetIsPremium(premium);
-    }
+    setIsPremium(premium);
     return premium;
   }
 
@@ -55,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!session) {
         setSession(null);
         setUser(null);
-        safetSetIsPremium(false);
+        setIsPremium(false);
         resolve();
       }
     });
@@ -69,7 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           resolve();
         })();
       } else {
-        safetSetIsPremium(false);
+        premiumFetchGen.current++;
+        setIsPremium(false);
         resolve();
       }
     });
@@ -103,19 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!res.ok) {
       return { error: new Error(data.error || 'Sign up failed') };
     }
-    if (data.session?.access_token && data.session?.refresh_token) {
-      await supabase.auth.signOut({ scope: 'local' });
-      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      });
-      if (sessionError) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) return { error: signInError };
-        return { error: null, accessToken: signInData.session?.access_token };
-      }
-      return { error: null, accessToken: sessionData.session?.access_token };
-    }
     await supabase.auth.signOut({ scope: 'local' });
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (signInError) {
@@ -128,13 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { session } } = await supabase.auth.getSession();
     const id = userId ?? session?.user?.id ?? user?.id;
     if (id) {
+      premiumFetchGen.current++;
       const { data } = await supabase
         .from('user_profiles')
         .select('is_premium')
         .eq('id', id)
         .maybeSingle();
-      const premium = data?.is_premium ?? false;
-      safetSetIsPremium(premium);
+      premiumFetchGen.current++;
+      setIsPremium(data?.is_premium ?? false);
     }
   };
 
