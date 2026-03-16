@@ -29,7 +29,7 @@ export default function PracticeFlashcardsPage() {
         .from('user_flashcard_tags')
         .select('flashcard_id, tag')
         .eq('user_id', user!.id)
-        .eq('tag', 'needs_practice');
+        .eq('tag', 'mastered');
 
       if (!tagRows || tagRows.length === 0) {
         setFlashcards([]);
@@ -94,7 +94,7 @@ export default function PracticeFlashcardsPage() {
       <div className="min-h-screen bg-warm-bg">
         <NavBar back="/vocabulary" title="Practice" />
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <p className="text-muted">No practice cards yet. Tag flashcards as "Practice" while studying.</p>
+          <p className="text-muted">No mastered phrases yet. Tag flashcards as "Mastered" while studying to review them here.</p>
         </div>
       </div>
     );
