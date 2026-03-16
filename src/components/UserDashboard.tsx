@@ -83,18 +83,18 @@ export default function UserDashboard() {
       {!stats.loading && stats.masteredCount > 0 && (
         <Link
           to="/vocabulary/practice"
-          className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 font-medium text-sm transition-colors"
+          className="inline-flex items-center gap-2 border border-white/30 hover:border-white/60 text-white font-semibold px-8 py-4 rounded-full text-base transition-all hover:gap-3 hover:bg-white/10"
         >
-          <Brain size={15} />
+          <Brain size={18} />
           Test your mastered phrases
         </Link>
       )}
       {!stats.loading && stats.masteredCount === 0 && (
         <Link
           to="/vocabulary"
-          className="inline-flex items-center gap-2 text-white/30 hover:text-white/50 font-medium text-sm transition-colors"
+          className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-white font-semibold px-8 py-4 rounded-full text-base transition-all hover:gap-3 hover:bg-white/10"
         >
-          <Brain size={15} />
+          <Brain size={18} />
           Mark phrases as mastered to review them
         </Link>
       )}
