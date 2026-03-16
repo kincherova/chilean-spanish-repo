@@ -89,7 +89,7 @@ export default function ModulesPage() {
   const [showSaveBanner, setShowSaveBanner] = useState(false);
   const { completedLessons } = useProgress();
   const { fontSize, cycleFontSize } = useFontSize();
-  const { isPremium, user } = useAuth();
+  const { isPremium, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -165,7 +165,7 @@ export default function ModulesPage() {
           </button>
         </div>
 
-        {loading ? (
+        {loading || authLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="bg-white rounded-card-lg p-5 animate-pulse">
