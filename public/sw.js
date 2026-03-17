@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chilean-spanish-v1773682835375';
+const CACHE_NAME = 'chilean-spanish-v1773744239241';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -20,7 +20,6 @@ self.addEventListener('activate', (event) => {
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
