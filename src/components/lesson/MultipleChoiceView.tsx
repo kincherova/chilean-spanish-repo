@@ -24,8 +24,8 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
   const item = page.items[currentItem];
 
-
   const advanceItem = () => {
+    setShowBravo(false);
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
       setWrongGuesses(new Set());
@@ -37,7 +37,8 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
   const handleSelect = (idx: number) => {
     if (correctlyAnswered || wrongGuesses.has(idx)) return;
-    if (idx === item.correctAnswer) {
+    const correct = page.items[currentItem].correctAnswer;
+    if (idx === correct) {
       setCorrectlyAnswered(true);
       setShowBravo(true);
       onCorrect();
@@ -49,12 +50,20 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
   useEffect(() => {
     if (!showBravo) return;
+    const itemIndex = currentItem;
+    const totalItems = page.items.length;
     const timer = setTimeout(() => {
       setShowBravo(false);
-      advanceItem();
+      if (itemIndex < totalItems - 1) {
+        setCurrentItem(itemIndex + 1);
+        setWrongGuesses(new Set());
+        setCorrectlyAnswered(false);
+      } else {
+        setDone(true);
+      }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [showBravo]);
+  }, [showBravo, currentItem, page.items.length]);
 
   const handleSkip = () => advanceItem();
 
