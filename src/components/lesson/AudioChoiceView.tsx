@@ -139,30 +139,24 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
       <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
       <div className="flex flex-col items-center py-8 mb-6">
-        {item.audioUrl ? (
-          <button
-            onClick={handlePlayAudio}
-            className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 ${
-              playing
-                ? 'bg-green-700 scale-95'
-                : loading
-                ? 'bg-green-600 scale-95'
-                : 'bg-coral hover:bg-coral-dark'
-            }`}
-          >
-            {loading ? (
-              <Loader2 size={30} className="text-white animate-spin" />
-            ) : playing ? (
-              <Volume2 size={30} className="text-white animate-pulse" />
-            ) : (
-              <Play size={30} className="text-white ml-1" />
-            )}
-          </button>
-        ) : (
-          <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-200">
-            <Volume2 size={30} className="text-gray-400" />
-          </div>
-        )}
+        <button
+          onClick={handlePlayAudio}
+          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 ${
+            playing
+              ? 'bg-green-700 scale-95'
+              : loading
+              ? 'bg-green-600 scale-95'
+              : 'bg-coral hover:bg-coral-dark'
+          }`}
+        >
+          {loading ? (
+            <Loader2 size={30} className="text-white animate-spin" />
+          ) : playing ? (
+            <Volume2 size={30} className="text-white animate-pulse" />
+          ) : (
+            <Play size={30} className="text-white ml-1" />
+          )}
+        </button>
         <p className={`text-muted mt-3 ${fs.bodySmall(fontSize)}`}>{item.question}</p>
       </div>
 
