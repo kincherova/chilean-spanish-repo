@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Volume2 } from 'lucide-react';
 import { IntroPage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
-import { playAudio } from '../../lib/audio';
+import { playAudio, preloadAudio } from '../../lib/audio';
 
 interface Props {
   page: IntroPage;
@@ -9,6 +10,18 @@ interface Props {
 }
 
 export default function IntroPageView({ page, fontSize }: Props) {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    page.phrases.forEach((phrase) => {
+      if (phrase.audioUrl) preloadAudio(phrase.audioUrl);
+    });
+  }, [page.phrases]);
+
+  const handlePlay = (idx: number, url: string) => {
+    setActiveIdx(idx);
+    playAudio(url, () => setActiveIdx((prev) => (prev === idx ? null : prev)));
+  };
 
   return (
     <div>
@@ -32,8 +45,12 @@ export default function IntroPageView({ page, fontSize }: Props) {
             </div>
             {phrase.audioUrl && (
               <button
-                onClick={() => playAudio(phrase.audioUrl!)}
-                className="p-2 bg-green-100 hover:bg-green-200 rounded-full text-green-600 transition-colors flex-shrink-0"
+                onClick={() => handlePlay(i, phrase.audioUrl!)}
+                className={`p-2 rounded-full transition-colors flex-shrink-0 ${
+                  activeIdx === i
+                    ? 'bg-green-700 text-white'
+                    : 'bg-green-100 hover:bg-green-200 text-green-600'
+                }`}
               >
                 <Volume2 size={15} />
               </button>

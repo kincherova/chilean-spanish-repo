@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Volume2, CheckCircle2, XCircle, ChevronRight, Play, SkipForward } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Volume2, CheckCircle2, XCircle, ChevronRight, Play, SkipForward, Loader2 } from 'lucide-react';
 import { AudioChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
-import { playAudio as playSharedAudio, stopAudio } from '../../lib/audio';
+import { playAudio as playSharedAudio, stopAudio, preloadAudio } from '../../lib/audio';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Props {
@@ -21,23 +21,55 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
   const [correctlyAnswered, setCorrectlyAnswered] = useState(false);
   const [done, setDone] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showBravo, setShowBravo] = useState(false);
+  const playingItemRef = useRef<number>(-1);
 
   const item = page.items[currentItem];
 
-  const playAudio = () => {
+  useEffect(() => {
+    page.items.forEach((it) => {
+      if (it.audioUrl) preloadAudio(it.audioUrl);
+    });
+  }, [page.items]);
+
+  const handlePlayAudio = () => {
     if (!item.audioUrl) return;
-    setPlaying(true);
-    playSharedAudio(item.audioUrl, () => setPlaying(false));
+    const thisItem = currentItem;
+    setLoading(true);
+    setPlaying(false);
+    playingItemRef.current = thisItem;
+    playSharedAudio(item.audioUrl, () => {
+      if (playingItemRef.current === thisItem) {
+        setPlaying(false);
+        setLoading(false);
+      }
+    });
+    const audio = document.createElement('audio');
+    audio.src = item.audioUrl;
+    if (audio.readyState >= 3) {
+      setLoading(false);
+      setPlaying(true);
+    } else {
+      const onReady = () => {
+        if (playingItemRef.current === thisItem) {
+          setLoading(false);
+          setPlaying(true);
+        }
+      };
+      setTimeout(onReady, 80);
+    }
   };
 
   const advanceItem = () => {
     stopAudio();
+    playingItemRef.current = -1;
+    setPlaying(false);
+    setLoading(false);
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
       setWrongGuesses(new Set());
       setCorrectlyAnswered(false);
-      setPlaying(false);
     } else {
       setDone(true);
     }
@@ -62,12 +94,14 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
     const totalItems = page.items.length;
     const timer = setTimeout(() => {
       stopAudio();
+      playingItemRef.current = -1;
       setShowBravo(false);
+      setPlaying(false);
+      setLoading(false);
       if (itemIndex < totalItems - 1) {
         setCurrentItem(itemIndex + 1);
         setWrongGuesses(new Set());
         setCorrectlyAnswered(false);
-        setPlaying(false);
       } else {
         setDone(true);
       }
@@ -106,13 +140,19 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
 
       <div className="flex flex-col items-center py-8 mb-6">
         <button
-          onClick={playAudio}
-          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-md ${
-            playing ? 'bg-coral/20 border-4 border-coral scale-95' : 'bg-coral hover:bg-coral-dark'
+          onClick={handlePlayAudio}
+          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 ${
+            playing
+              ? 'bg-green-700 scale-95'
+              : loading
+              ? 'bg-green-600 scale-95'
+              : 'bg-coral hover:bg-coral-dark'
           }`}
         >
-          {playing ? (
-            <Volume2 size={30} className="text-coral animate-pulse" />
+          {loading ? (
+            <Loader2 size={30} className="text-white animate-spin" />
+          ) : playing ? (
+            <Volume2 size={30} className="text-white animate-pulse" />
           ) : (
             <Play size={30} className="text-white ml-1" />
           )}
