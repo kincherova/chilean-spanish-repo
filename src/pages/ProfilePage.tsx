@@ -184,6 +184,7 @@ export default function ProfilePage() {
                 )}
                 {upgradeLoading ? 'Redirecting to checkout...' : 'Get full access'}
               </button>
+              <p className="mt-2 text-center text-xs text-amber-700">One-time payment — not a subscription.</p>
               {upgradeError && (
                 <p className="mt-3 text-xs text-red-600 text-center">{upgradeError}</p>
               )}
