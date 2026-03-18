@@ -25,7 +25,7 @@ export default function OverviewPageView({ page, fontSize }: Props) {
           <Lightbulb size={20} className="text-gold flex-shrink-0 mt-0.5" />
           <div>
             <p className={`font-semibold text-navy mb-1 ${fs.bodySmall(fontSize)}`}>Cultural note</p>
-            <p className={`text-muted leading-relaxed ${fs.bodySmall(fontSize)}`}>{page.cultural_note}</p>
+            <p className={`text-muted leading-relaxed whitespace-pre-line ${fs.bodySmall(fontSize)}`}>{page.cultural_note}</p>
           </div>
         </div>
       )}
