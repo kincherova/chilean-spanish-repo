@@ -98,17 +98,22 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
       <div className="bg-white rounded-card-lg p-5 mb-5">
         {item.phrase && (
-          <div className="flex items-center justify-between mb-2">
-            <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
-            {item.audioUrl && (
-              <button
-                onClick={() => playAudio(item.audioUrl!)}
-                className="p-2 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
-              >
-                <Volume2 size={16} />
-              </button>
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
+              {item.audioUrl && (
+                <button
+                  onClick={() => playAudio(item.audioUrl!)}
+                  className="p-2 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                >
+                  <Volume2 size={16} />
+                </button>
+              )}
+            </div>
+            {item.question && (
+              <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
             )}
-          </div>
+          </>
         )}
         {!item.phrase && <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>}
       </div>
