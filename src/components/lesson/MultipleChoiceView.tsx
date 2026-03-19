@@ -99,7 +99,8 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
       )}
 
       <h1 className={`font-display font-bold text-navy mb-1 ${fs.heading(fontSize)}`}>{page.title}</h1>
-      <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
+      <p className={`text-muted mb-1 ${fs.bodySmall(fontSize)}`}>Read the phrase and pick the correct answer.</p>
+      <p className={`text-muted/60 mb-6 ${fs.label(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
       <div className="bg-white rounded-card-lg p-5 mb-5">
         {item.phrase && (
