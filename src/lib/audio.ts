@@ -1,5 +1,29 @@
 let currentAudio: HTMLAudioElement | null = null;
 const preloadCache = new Map<string, HTMLAudioElement>();
+export function speakSpanish(text: string): void {
+  if (!window.speechSynthesis) return;
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio.onended = null;
+    currentAudio = null;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-419';
+  utterance.rate = 0.85;
+
+  const voices = window.speechSynthesis.getVoices();
+  const spanishVoice = voices.find(
+    (v) => v.lang.startsWith('es') && (v.lang.includes('419') || v.lang.includes('MX') || v.lang.includes('CL') || v.lang.includes('ES'))
+  ) ?? voices.find((v) => v.lang.startsWith('es'));
+  if (spanishVoice) utterance.voice = spanishVoice;
+
+  window.speechSynthesis.speak(utterance);
+}
 
 export function preloadAudio(url: string): void {
   if (preloadCache.has(url)) return;

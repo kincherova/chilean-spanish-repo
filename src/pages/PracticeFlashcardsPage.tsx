@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
-import { playAudio } from '../lib/audio';
+import { playAudio, speakSpanish } from '../lib/audio';
 import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -167,14 +167,19 @@ export default function PracticeFlashcardsPage() {
             >
               <p className="text-xs text-muted uppercase tracking-wider mb-4">Spanish</p>
               <p className={`font-display font-bold text-navy text-center leading-tight ${fs.heading(fontSize)}`}>{card?.spanish_text}</p>
-              {card?.audio_url && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
-                  className="mt-5 p-2.5 bg-amber-50 hover:bg-amber-100 rounded-full text-amber-500 transition-colors"
-                >
-                  <Volume2 size={18} />
-                </button>
-              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (card?.audio_url) {
+                    playAudio(card.audio_url);
+                  } else if (card?.spanish_text) {
+                    speakSpanish(card.spanish_text);
+                  }
+                }}
+                className="mt-5 p-2.5 bg-amber-50 hover:bg-amber-100 rounded-full text-amber-500 transition-colors"
+              >
+                <Volume2 size={18} />
+              </button>
               <p className="text-muted text-xs mt-4">Tap to reveal</p>
             </div>
             <div

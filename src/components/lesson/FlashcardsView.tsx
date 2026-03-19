@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Flashcard } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
-import { playAudio } from '../../lib/audio';
+import { playAudio, speakSpanish } from '../../lib/audio';
 
 interface Props {
   flashcards: Flashcard[];
@@ -60,14 +60,19 @@ export default function FlashcardsView({ flashcards, fontSize }: Props) {
           >
             <p className={`text-muted uppercase tracking-wider mb-4 ${fs.label(fontSize)}`}>Spanish</p>
             <p className={`font-display font-bold text-navy text-center ${fs.heading(fontSize)}`}>{card?.spanish_text}</p>
-            {card?.audio_url && (
-              <button
-                onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
-                className="mt-4 p-2 bg-green-100 hover:bg-green-200 rounded-full text-green-600 transition-colors"
-              >
-                <Volume2 size={16} />
-              </button>
-            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (card?.audio_url) {
+                  playAudio(card.audio_url);
+                } else if (card?.spanish_text) {
+                  speakSpanish(card.spanish_text);
+                }
+              }}
+              className="mt-4 p-2 bg-green-100 hover:bg-green-200 rounded-full text-green-600 transition-colors"
+            >
+              <Volume2 size={16} />
+            </button>
             <p className={`text-muted mt-3 ${fs.label(fontSize)}`}>Tap to reveal</p>
           </div>
           <div
