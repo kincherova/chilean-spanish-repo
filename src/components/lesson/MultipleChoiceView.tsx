@@ -4,6 +4,7 @@ import { MultipleChoicePage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
 import { playAudio } from '../../lib/audio';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRef } from 'react';
 
 interface Props {
   page: MultipleChoicePage;
@@ -21,11 +22,15 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
   const [correctlyAnswered, setCorrectlyAnswered] = useState(false);
   const [done, setDone] = useState(false);
   const [showBravo, setShowBravo] = useState(false);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const audioItemRef = useRef<number>(-1);
 
   const item = page.items[currentItem];
 
   const advanceItem = () => {
     setShowBravo(false);
+    setAudioPlaying(false);
+    audioItemRef.current = -1;
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
       setWrongGuesses(new Set());
@@ -103,8 +108,19 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
               <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
               {item.audioUrl && (
                 <button
-                  onClick={() => playAudio(item.audioUrl!)}
-                  className="p-2 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                  onClick={() => {
+                    const thisItem = currentItem;
+                    audioItemRef.current = thisItem;
+                    setAudioPlaying(true);
+                    playAudio(item.audioUrl!, () => {
+                      if (audioItemRef.current === thisItem) setAudioPlaying(false);
+                    });
+                  }}
+                  className={`p-2 rounded-full transition-colors flex-shrink-0 ${
+                    audioPlaying
+                      ? 'bg-green-700 text-white'
+                      : 'bg-green-100 hover:bg-green-200 text-green-600'
+                  }`}
                 >
                   <Volume2 size={16} />
                 </button>
