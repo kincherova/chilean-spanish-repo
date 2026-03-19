@@ -136,7 +136,8 @@ export default function AudioChoiceView({ page, fontSize, onCorrect, onWrong, on
       )}
 
       <h1 className={`font-display font-bold text-navy mb-1 ${fs.heading(fontSize)}`}>{page.title}</h1>
-      <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
+      <p className={`text-muted mb-1 ${fs.bodySmall(fontSize)}`}>Listen to the audio and pick what you hear.</p>
+      <p className={`text-muted/60 mb-6 ${fs.label(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
       <div className="flex flex-col items-center py-8 mb-6">
         <button
