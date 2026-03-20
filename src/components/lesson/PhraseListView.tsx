@@ -1,16 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Volume2 } from 'lucide-react';
-import { PhraseListPage } from '../../types/database';
+import { PhraseListPage, Flashcard } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
-import { playAudio } from '../../lib/audio';
+import { playAudio, preloadAudio } from '../../lib/audio';
 
 interface Props {
   page: PhraseListPage;
   fontSize: FontSize;
+  flashcards?: Flashcard[];
 }
 
-export default function PhraseListView({ page, fontSize }: Props) {
+export default function PhraseListView({ page, fontSize, flashcards = [] }: Props) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  const audioMap = new Map(flashcards.map((f) => [f.spanish_text.toLowerCase(), f.audio_url]));
+
+  const getAudio = (phrase: { spanish: string; audioUrl?: string }) =>
+    phrase.audioUrl || audioMap.get(phrase.spanish.toLowerCase()) || null;
+
+  useEffect(() => {
+    page.phrases.forEach((phrase) => {
+      const url = getAudio(phrase);
+      if (url) preloadAudio(url);
+    });
+  }, [page.phrases, flashcards]);
 
   const handlePlay = (idx: number, url: string) => {
     setActiveIdx(idx);
@@ -23,31 +36,34 @@ export default function PhraseListView({ page, fontSize }: Props) {
       {page.subtitle && <p className={`text-muted mb-5 ${fs.bodySmall(fontSize)}`}>{page.subtitle}</p>}
 
       <div className="space-y-2.5">
-        {page.phrases.map((phrase, i) => (
-          <div key={i} className="bg-white rounded-card-lg p-4 flex items-center justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className={`font-semibold text-navy ${fs.body(fontSize)}`}>{phrase.spanish}</p>
-                {phrase.isChilean && (
-                  <span className="text-sm" title="Chilean expression">🇨🇱</span>
-                )}
+        {page.phrases.map((phrase, i) => {
+          const audioUrl = getAudio(phrase);
+          return (
+            <div key={i} className="bg-white rounded-card-lg p-4 flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className={`font-semibold text-navy ${fs.body(fontSize)}`}>{phrase.spanish}</p>
+                  {phrase.isChilean && (
+                    <span className="text-sm" title="Chilean expression">🇨🇱</span>
+                  )}
+                </div>
+                <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{phrase.english}</p>
               </div>
-              <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{phrase.english}</p>
+              {audioUrl && (
+                <button
+                  onClick={() => handlePlay(i, audioUrl)}
+                  className={`p-2 rounded-full transition-colors flex-shrink-0 ${
+                    activeIdx === i
+                      ? 'bg-green-700 text-white'
+                      : 'bg-green-100 hover:bg-green-200 text-green-600'
+                  }`}
+                >
+                  <Volume2 size={15} />
+                </button>
+              )}
             </div>
-            {phrase.audioUrl && (
-              <button
-                onClick={() => handlePlay(i, phrase.audioUrl!)}
-                className={`p-2 rounded-full transition-colors flex-shrink-0 ${
-                  activeIdx === i
-                    ? 'bg-green-700 text-white'
-                    : 'bg-green-100 hover:bg-green-200 text-green-600'
-                }`}
-              >
-                <Volume2 size={15} />
-              </button>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

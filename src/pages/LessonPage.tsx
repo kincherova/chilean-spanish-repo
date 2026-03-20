@@ -145,7 +145,7 @@ export default function LessonPage() {
             <IntroPageView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'phrase_list' && (
-            <PhraseListView page={page as PhraseListPage} fontSize={fontSize} />
+            <PhraseListView page={page as PhraseListPage} fontSize={fontSize} flashcards={flashcards} />
           )}
           {page?.type === 'multiple_choice' && (
             <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
