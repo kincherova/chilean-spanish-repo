@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, ChevronRight, ChevronLeft, BrainCircuit } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage } from '../types/database';
+import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage, PhraseListPage } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import OverviewPageView from '../components/lesson/OverviewPageView';
@@ -13,6 +13,7 @@ import FlashcardsView from '../components/lesson/FlashcardsView';
 import DialogueView from '../components/lesson/DialogueView';
 import DialoguePracticeView from '../components/lesson/DialoguePracticeView';
 import RecapView from '../components/lesson/RecapView';
+import PhraseListView from '../components/lesson/PhraseListView';
 
 const FONT_SIZE_LABELS: Record<string, string> = {
   normal: 'A',
@@ -142,6 +143,9 @@ export default function LessonPage() {
           )}
           {page?.type === 'intro' && (
             <IntroPageView page={page} fontSize={fontSize} />
+          )}
+          {page?.type === 'phrase_list' && (
+            <PhraseListView page={page as PhraseListPage} fontSize={fontSize} />
           )}
           {page?.type === 'multiple_choice' && (
             <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />

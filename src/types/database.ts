@@ -73,6 +73,7 @@ export interface LessonContent {
 export type LessonPage =
   | OverviewPage
   | IntroPage
+  | PhraseListPage
   | MultipleChoicePage
   | AudioChoicePage
   | FlashcardsPage
@@ -89,6 +90,13 @@ export interface OverviewPage {
 
 export interface IntroPage {
   type: 'intro';
+  title: string;
+  subtitle?: string;
+  phrases: Phrase[];
+}
+
+export interface PhraseListPage {
+  type: 'phrase_list';
   title: string;
   subtitle?: string;
   phrases: Phrase[];
