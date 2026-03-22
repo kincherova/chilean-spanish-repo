@@ -1,8 +1,52 @@
 import { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, XCircle, ChevronRight, SkipForward } from 'lucide-react';
+import { CheckCircle2, XCircle, ChevronRight, SkipForward, AlertCircle } from 'lucide-react';
 import { RecallPage } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
 import { useAuth } from '../../contexts/AuthContext';
+
+const ACCENT_MAP: Record<string, string> = {
+  'n': 'ñ',
+  'a': 'á',
+  'e': 'é',
+  'i': 'í',
+  'o': 'ó',
+  'u': 'ú',
+};
+
+const SPECIAL_CHAR_WORDS: Record<string, string[]> = {
+  'bano':           ['baño',          'ñ is not the same as n'],
+  'cafe':           ['café',          'é is not the same as e'],
+  'azucar':         ['azúcar',        'ú is not the same as u'],
+  'acompanamiento': ['Acompañamiento','ñ is not the same as n'],
+  'jamon':          ['Jamón',         'ó is not the same as o'],
+  'sandwich':       ['Sándwich',      'á is not the same as a'],
+  'credito':        ['Crédito',       'é is not the same as e'],
+};
+
+function getAccentWarning(input: string, correct: string): string | null {
+  const normInput = input.trim().toLowerCase();
+  const normCorrect = correct.trim().toLowerCase();
+
+  const stripped = normCorrect
+    .replace(/ñ/g, 'n')
+    .replace(/[áàä]/g, 'a')
+    .replace(/[éèë]/g, 'e')
+    .replace(/[íìï]/g, 'i')
+    .replace(/[óòö]/g, 'o')
+    .replace(/[úùü]/g, 'u');
+
+  if (normInput !== stripped) return null;
+
+  const entry = SPECIAL_CHAR_WORDS[stripped];
+  if (!entry) return null;
+
+  for (const [plain, special] of Object.entries(ACCENT_MAP)) {
+    if (normCorrect.includes(special) && normInput.includes(plain) && !normInput.includes(special)) {
+      return `Heads up: "${special}" is not the same as "${plain}" — make sure to write it correctly next time!`;
+    }
+  }
+  return null;
+}
 
 interface Props {
   page: RecallPage;
@@ -23,6 +67,7 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
   const [itemState, setItemState] = useState<ItemState>('idle');
   const [done, setDone] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
+  const [accentWarning, setAccentWarning] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const item = page.items[currentItem];
@@ -47,6 +92,7 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     setInputValue('');
     setItemState('idle');
     setShowCorrect(false);
+    setAccentWarning(null);
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
     } else {
@@ -78,10 +124,14 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     if (!inputValue.trim()) return;
 
     if (itemState === 'idle') {
+      const warning = getAccentWarning(inputValue, item.spanish);
+      setAccentWarning(warning);
       setItemState('try2');
       setInputValue('');
       onWrong();
     } else if (itemState === 'try2') {
+      const warning = getAccentWarning(inputValue, item.spanish);
+      setAccentWarning(warning);
       setItemState('revealed');
       setShowCorrect(true);
       onWrong();
@@ -135,9 +185,21 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
         <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.english}</p>
       </div>
 
-      {itemState === 'try2' && (
+      {itemState === 'try2' && !accentWarning && (
         <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-card mb-3">
           <span className={`text-amber-700 font-medium ${fs.label(fontSize)}`}>Not quite — try once more!</span>
+        </div>
+      )}
+
+      {accentWarning && (itemState === 'try2' || isFinished) && (
+        <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-card mb-3">
+          <AlertCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className={`text-amber-800 font-semibold ${fs.label(fontSize)}`}>
+              {itemState === 'try2' ? 'Not quite — try once more!' : 'Incorrect'}
+            </p>
+            <p className={`text-amber-700 ${fs.label(fontSize)}`}>{accentWarning}</p>
+          </div>
         </div>
       )}
 
