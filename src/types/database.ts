@@ -79,7 +79,8 @@ export type LessonPage =
   | FlashcardsPage
   | DialoguePage
   | DialoguePracticePage
-  | RecapPage;
+  | RecapPage
+  | RecallPage;
 
 export interface OverviewPage {
   type: 'overview';
@@ -168,4 +169,15 @@ export interface RecapPage {
   type: 'recap';
   title: string;
   dialogue?: DialogueLine[];
+}
+
+export interface RecallPage {
+  type: 'recall';
+  title: string;
+  items: RecallItem[];
+}
+
+export interface RecallItem {
+  english: string;
+  spanish: string;
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, ChevronRight, ChevronLeft, BrainCircuit } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage, PhraseListPage } from '../types/database';
+import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage, PhraseListPage, RecallPage } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import OverviewPageView from '../components/lesson/OverviewPageView';
@@ -14,6 +14,7 @@ import DialogueView from '../components/lesson/DialogueView';
 import DialoguePracticeView from '../components/lesson/DialoguePracticeView';
 import RecapView from '../components/lesson/RecapView';
 import PhraseListView from '../components/lesson/PhraseListView';
+import RecallView from '../components/lesson/RecallView';
 
 const FONT_SIZE_LABELS: Record<string, string> = {
   normal: 'A',
@@ -165,9 +166,12 @@ export default function LessonPage() {
           {page?.type === 'recap' && (
             <RecapView page={page} lessonTitle={lesson.title} fontSize={fontSize} />
           )}
+          {page?.type === 'recall' && (
+            <RecallView page={page as RecallPage} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
+          )}
         </div>
 
-        {page?.type !== 'multiple_choice' && page?.type !== 'audio_choice' && (
+        {page?.type !== 'multiple_choice' && page?.type !== 'audio_choice' && page?.type !== 'recall' && (
           <div className="pt-6 flex flex-col gap-3">
             <button
               onClick={handleNext}
