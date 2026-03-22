@@ -17,14 +17,15 @@ export default function UserDashboard() {
   const { user } = useAuth();
   const { completedLessons } = useProgress();
   const [stats, setStats] = useState<DashboardStats>({ masteredCount: 0, totalPhrases: 0, loading: true });
+  const [profileName, setProfileName] = useState<string | null>(null);
 
   const completedUnits = completedLessons.size;
 
   useEffect(() => {
     if (!user) return;
 
-    async function fetchMastered() {
-      const [{ count: masteredCount }, { count: totalPhrases }] = await Promise.all([
+    async function fetchData() {
+      const [{ count: masteredCount }, { count: totalPhrases }, { data: profile }] = await Promise.all([
         supabase
           .from('user_flashcard_tags')
           .select('*', { count: 'exact', head: true })
@@ -33,15 +34,22 @@ export default function UserDashboard() {
         supabase
           .from('flashcards')
           .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('user_profiles')
+          .select('name')
+          .eq('id', user!.id)
+          .maybeSingle(),
       ]);
 
       setStats({ masteredCount: masteredCount ?? 0, totalPhrases: totalPhrases ?? 0, loading: false });
+      if (profile?.name) setProfileName(profile.name);
     }
 
-    fetchMastered();
+    fetchData();
   }, [user]);
 
-  const firstName = user?.user_metadata?.name?.split(' ')[0] ?? null;
+  const metaName = user?.user_metadata?.name as string | undefined;
+  const firstName = (metaName || profileName)?.split(' ')[0] ?? null;
   const progressPercent = Math.round((completedUnits / TOTAL_UNITS) * 100);
   const phrasesPercent = stats.totalPhrases > 0 ? Math.round((stats.masteredCount / stats.totalPhrases) * 100) : 0;
 
