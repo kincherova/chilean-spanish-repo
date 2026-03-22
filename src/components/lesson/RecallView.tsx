@@ -12,7 +12,7 @@ interface Props {
   onNext: () => void;
 }
 
-type ItemState = 'idle' | 'correct' | 'incorrect' | 'skipped';
+type ItemState = 'idle' | 'try2' | 'revealed' | 'correct' | 'skipped';
 
 export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext }: Props) {
   const { user } = useAuth();
@@ -22,12 +22,13 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
   const [inputValue, setInputValue] = useState('');
   const [itemState, setItemState] = useState<ItemState>('idle');
   const [done, setDone] = useState(false);
+  const [showCorrect, setShowCorrect] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const item = page.items[currentItem];
 
   useEffect(() => {
-    if (itemState === 'idle') {
+    if (itemState === 'idle' || itemState === 'try2') {
       inputRef.current?.focus();
     }
   }, [currentItem, itemState]);
@@ -45,6 +46,7 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
   const advance = () => {
     setInputValue('');
     setItemState('idle');
+    setShowCorrect(false);
     if (currentItem < page.items.length - 1) {
       setCurrentItem((i) => i + 1);
     } else {
@@ -52,28 +54,47 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (itemState !== 'idle' && itemState !== 'try2') return;
+    const val = e.target.value;
+    setInputValue(val);
+
+    if (isAccepted(val, item.spanish)) {
+      setItemState('correct');
+      onCorrect();
+      setTimeout(() => advance(), 800);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (itemState !== 'idle') {
+    if (itemState === 'correct') return;
+
+    if (itemState === 'revealed' || itemState === 'skipped') {
       advance();
       return;
     }
+
     if (!inputValue.trim()) return;
-    if (isAccepted(inputValue, item.spanish)) {
-      setItemState('correct');
-      onCorrect();
-    } else {
-      setItemState('incorrect');
+
+    if (itemState === 'idle') {
+      setItemState('try2');
+      setInputValue('');
+      onWrong();
+    } else if (itemState === 'try2') {
+      setItemState('revealed');
+      setShowCorrect(true);
       onWrong();
     }
   };
 
   const handleSkip = () => {
-    if (itemState !== 'idle') {
+    if (itemState === 'revealed' || itemState === 'skipped') {
       advance();
       return;
     }
     setItemState('skipped');
+    setShowCorrect(true);
     onWrong();
   };
 
@@ -95,7 +116,13 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     );
   }
 
-  const isRevealed = itemState !== 'idle';
+  const isFinished = itemState === 'revealed' || itemState === 'skipped';
+  const isTyping = itemState === 'idle' || itemState === 'try2';
+
+  let inputBorderClass = 'border-gray-200 bg-white focus:border-coral/60';
+  if (itemState === 'correct') inputBorderClass = 'border-green-400 bg-green-50';
+  else if (isFinished) inputBorderClass = 'border-red-300 bg-red-50';
+  else if (itemState === 'try2') inputBorderClass = 'border-amber-300 bg-amber-50';
 
   return (
     <div>
@@ -108,62 +135,63 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
         <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.english}</p>
       </div>
 
+      {itemState === 'try2' && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-card mb-3">
+          <span className={`text-amber-700 font-medium ${fs.label(fontSize)}`}>Not quite — try once more!</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="relative mb-3">
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => {
-              if (itemState === 'idle') setInputValue(e.target.value);
-            }}
-            disabled={isRevealed}
-            placeholder="Type in Spanish…"
+            onChange={handleChange}
+            disabled={!isTyping}
+            placeholder={itemState === 'try2' ? 'Try again…' : 'Type in Spanish…'}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="none"
             spellCheck={false}
-            className={`w-full px-4 py-3.5 rounded-card border-2 text-navy font-medium outline-none transition-all ${fs.body(fontSize)} ${
-              itemState === 'correct'
-                ? 'border-green-400 bg-green-50'
-                : itemState === 'incorrect' || itemState === 'skipped'
-                ? 'border-red-300 bg-red-50'
-                : 'border-gray-200 bg-white focus:border-coral/60'
-            }`}
+            className={`w-full px-4 py-3.5 rounded-card border-2 text-navy font-medium outline-none transition-all ${fs.body(fontSize)} ${inputBorderClass}`}
           />
           {itemState === 'correct' && (
             <CheckCircle2 size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
           )}
-          {(itemState === 'incorrect' || itemState === 'skipped') && (
+          {isFinished && (
             <XCircle size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400" />
           )}
         </div>
 
-        {(itemState === 'incorrect' || itemState === 'skipped') && (
+        {showCorrect && (
           <div className="flex items-center gap-2 px-4 py-3 bg-navy/5 rounded-card mb-3">
             <span className={`text-muted ${fs.label(fontSize)}`}>Correct answer:</span>
             <span className={`font-display font-bold text-navy ${fs.body(fontSize)}`}>{item.spanish}</span>
           </div>
         )}
 
-        <button
-          type="submit"
-          className={`w-full flex items-center justify-center gap-2 font-semibold py-3.5 rounded-card transition-colors ${
-            isRevealed
-              ? 'bg-coral hover:bg-coral-dark text-white'
-              : 'bg-coral hover:bg-coral-dark text-white disabled:opacity-50'
-          }`}
-          disabled={!isRevealed && !inputValue.trim()}
-        >
-          {isRevealed ? (
-            <>Continue <ChevronRight size={18} /></>
-          ) : (
-            'Check'
-          )}
-        </button>
+        {isTyping && (
+          <button
+            type="submit"
+            disabled={!inputValue.trim()}
+            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors disabled:opacity-50"
+          >
+            {itemState === 'try2' ? 'Check again' : 'Check'}
+          </button>
+        )}
+
+        {isFinished && (
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
+          >
+            Continue <ChevronRight size={18} />
+          </button>
+        )}
       </form>
 
-      {!isRevealed && (
+      {isTyping && (
         <div className="space-y-2">
           <button
             onClick={handleSkip}
