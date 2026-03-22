@@ -31,7 +31,7 @@ export default function DialogueView({ page, fontSize }: Props) {
       {showToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-navy text-white text-sm px-5 py-3 rounded-xl shadow-lg flex items-center gap-2.5 animate-fade-in max-w-xs text-center">
           <Check size={15} className="text-green-400 flex-shrink-0" />
-          <span>List copied! You may paste it in your notes to use offline.</span>
+          <span>Dialogue copied! You may paste it in your notes to use offline.</span>
         </div>
       )}
 
@@ -46,7 +46,7 @@ export default function DialogueView({ page, fontSize }: Props) {
           }`}
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
-          {copied ? 'Copied!' : 'Copy list'}
+          {copied ? 'Copied!' : 'Copy dialogue'}
         </button>
       </div>
       {page.subtitle && <p className={`text-muted mb-5 ${fs.bodySmall(fontSize)}`}>{page.subtitle}</p>}
