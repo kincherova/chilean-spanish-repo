@@ -226,6 +226,33 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
           )}
         </div>
 
+        {isTyping && (
+          <div className="flex gap-2 mb-3">
+            {['á', 'é', 'ñ', 'ó', 'ú'].map((char) => (
+              <button
+                key={char}
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const input = inputRef.current;
+                  if (!input) return;
+                  const start = input.selectionStart ?? inputValue.length;
+                  const end = input.selectionEnd ?? inputValue.length;
+                  const next = inputValue.slice(0, start) + char + inputValue.slice(end);
+                  setInputValue(next);
+                  requestAnimationFrame(() => {
+                    input.focus();
+                    input.setSelectionRange(start + 1, start + 1);
+                  });
+                }}
+                className={`flex-1 py-2.5 rounded-card border-2 border-navy/20 bg-white text-navy font-semibold hover:bg-navy/5 hover:border-navy/40 active:bg-navy/10 transition-colors ${fs.body(fontSize)}`}
+              >
+                {char}
+              </button>
+            ))}
+          </div>
+        )}
+
         {showCorrect && (
           <div className="flex items-center gap-2 px-4 py-3 bg-navy/5 rounded-card mb-3">
             <span className={`text-muted ${fs.label(fontSize)}`}>Correct answer:</span>
