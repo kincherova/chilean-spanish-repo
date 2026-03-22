@@ -15,6 +15,7 @@ import PracticeFlashcardsPage from './pages/PracticeFlashcardsPage';
 import PaymentResultPage from './pages/PaymentResultPage';
 import UpgradePage from './pages/UpgradePage';
 import AboutIrinaPage from './pages/AboutIrinaPage';
+import LandingPage from './pages/LandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
               <Route path="/payment/pending" element={<PaymentResultPage result="pending" />} />
               <Route path="/payment/failure" element={<PaymentResultPage result="failure" />} />
               <Route path="/about-irina" element={<AboutIrinaPage />} />
+              <Route path="/chileanspanish" element={<LandingPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </FontSizeProvider>
