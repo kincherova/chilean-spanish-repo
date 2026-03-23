@@ -50,7 +50,7 @@ export default function LandingPage() {
 
       {/* HERO */}
       <section className="max-w-4xl mx-auto px-6 pt-12 pb-20 text-center">
-        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-12">
           Your trip to Chile<br />
           <span className="text-coral">starts here</span>
         </h1>
@@ -69,83 +69,20 @@ export default function LandingPage() {
         <p className="text-white/30 text-sm mt-4">No credit card needed — first module is completely free</p>
       </section>
 
-      {/* APP SCREENSHOTS — mockup cards */}
+      {/* APP SCREENSHOTS */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-start">
           {[
-            {
-              label: 'Your lessons',
-              bg: 'bg-warm-bg',
-              content: (
-                <div className="p-4 space-y-3">
-                  <div className="h-5 w-1/2 bg-navy/10 rounded-full" />
-                  {['Airport Arrival', 'Taking a Taxi', 'At a Restaurant', 'Shopping'].map((t, i) => (
-                    <div key={t} className="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm">
-                      <div className="w-8 h-8 rounded-lg bg-warm-bg flex items-center justify-center text-sm">
-                        {['✈️','🚕','🍽️','🛍️'][i]}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="h-3 w-20 bg-navy/20 rounded-full mb-1.5" />
-                        <div className="h-2 w-14 bg-navy/10 rounded-full" />
-                      </div>
-                      <div className="w-4 h-4 rounded-full border-2 border-gray-200" />
-                    </div>
-                  ))}
-                </div>
-              ),
-            },
-            {
-              label: 'Phrase lessons with audio',
-              bg: 'bg-navy',
-              content: (
-                <div className="p-4 space-y-3">
-                  <div className="text-xs text-white/40 font-medium uppercase tracking-widest mb-2">Phrase 2 of 6</div>
-                  <div className="bg-white/10 rounded-xl p-4 text-center">
-                    <p className="text-white font-bold text-xl mb-1">¿Me puede llevar a...?</p>
-                    <p className="text-white/50 text-sm">Can you take me to...?</p>
-                  </div>
-                  <button className="w-full flex items-center justify-center gap-2 bg-teal/20 border border-teal/30 text-teal rounded-xl py-3 text-sm font-semibold">
-                    <Volume2 size={16} /> Play audio
-                  </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['¿Correcto?','Necesito ayuda'].map((p) => (
-                      <div key={p} className="bg-white/5 rounded-lg p-2.5 text-center text-white/60 text-xs">{p}</div>
-                    ))}
-                  </div>
-                </div>
-              ),
-            },
-            {
-              label: 'Flashcard practice',
-              bg: 'bg-warm-bg',
-              content: (
-                <div className="p-4">
-                  <div className="text-xs text-muted font-medium mb-3 text-center">Tap to reveal translation</div>
-                  <div className="bg-white rounded-2xl shadow-md p-6 text-center mb-3">
-                    <p className="text-navy font-bold text-2xl mb-1">La cuenta, por favor</p>
-                    <div className="h-px bg-gray-100 my-3" />
-                    <p className="text-muted text-sm">The bill, please</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-red-50 border border-red-200 rounded-xl p-2.5 text-center text-xs font-semibold text-red-600">Practice more</div>
-                    <div className="flex-1 bg-green-50 border border-green-200 rounded-xl p-2.5 text-center text-xs font-semibold text-green-700">Mastered!</div>
-                  </div>
-                </div>
-              ),
-            },
+            { src: '/IMG_20260322_212116.jpg', label: 'Your lessons' },
+            { src: '/IMG_20260322_212050.jpg', label: 'Flashcard practice' },
+            { src: '/IMG_20260322_212033.jpg', label: 'This or That quiz' },
           ].map((screen) => (
-            <div key={screen.label} className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
-              <div className="px-4 pt-3 pb-1 flex items-center gap-2 border-b border-white/5">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                </div>
-                <span className="text-xs text-white/30 font-medium">{screen.label}</span>
-              </div>
-              <div className={screen.bg}>
-                {screen.content}
-              </div>
+            <div key={screen.label} className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <img
+                src={screen.src}
+                alt={screen.label}
+                className="w-full h-auto block"
+              />
             </div>
           ))}
         </div>
