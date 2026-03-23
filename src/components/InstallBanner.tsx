@@ -19,7 +19,7 @@ export default function InstallBanner() {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-navy">Add app to your home screen</p>
         <p className="text-xs text-muted mt-0.5 leading-relaxed">
-          Install the app for quick access — no browser bar, works offline.
+          Install the app for quick access — no browser bar, faster loading.
         </p>
         <div className="relative inline-block mt-2">
           <button
