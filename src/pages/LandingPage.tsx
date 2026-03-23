@@ -55,7 +55,7 @@ export default function LandingPage() {
           <span className="text-coral">starts here</span>
         </h1>
 
-        <p className="text-white/60 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-white/60 text-lg sm:text-xl max-w-2xl mx-auto mb-20 leading-relaxed">
           Chilean Spanish is unlike any other. Locals speak fast, drop letters, and use slang you won't find in a textbook. This app prepares you for the real thing — so you arrive ready, not lost.
         </p>
 
