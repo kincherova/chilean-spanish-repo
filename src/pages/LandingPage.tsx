@@ -60,12 +60,24 @@ export default function LandingPage() {
             { src: '/IMG_20260322_212050.jpg', label: 'Flashcard practice' },
             { src: '/IMG_20260322_212033.jpg', label: 'This or That quiz' },
           ].map((screen) => (
-            <div key={screen.label} className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-              <img
-                src={screen.src}
-                alt={screen.label}
-                className="w-full h-auto block"
-              />
+            <div key={screen.label} className="flex flex-col items-center gap-3">
+              <div className="relative w-full max-w-[280px] mx-auto">
+                <div className="relative bg-[#111] rounded-[2.5rem] p-[10px] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_30px_60px_rgba(0,0,0,0.6),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+                  <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[22px] bg-[#111] rounded-b-xl z-10 flex items-center justify-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#222] ring-1 ring-white/10" />
+                    <div className="w-[40px] h-[5px] rounded-full bg-[#222]" />
+                  </div>
+                  <div className="rounded-[1.8rem] overflow-hidden">
+                    <img
+                      src={screen.src}
+                      alt={screen.label}
+                      className="w-full h-auto block"
+                    />
+                  </div>
+                  <div className="absolute bottom-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[4px] rounded-full bg-white/20" />
+                </div>
+              </div>
+              <p className="text-white/50 text-sm font-medium tracking-wide">{screen.label}</p>
             </div>
           ))}
         </div>
