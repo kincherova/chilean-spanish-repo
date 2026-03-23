@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Clock, ChevronRight, CheckCircle2, Lock, UserPlus, X } from 'lucide-react';
 import NavBar from '../components/NavBar';
+import InstallBanner from '../components/InstallBanner';
 import { supabase } from '../lib/supabase';
 import { Module, Unit, Lesson } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
@@ -240,6 +241,8 @@ export default function ModulesPage() {
                 </div>
               </div>
             )}
+
+            <InstallBanner />
 
             {showSaveBanner && !user && (
               <div className="mt-4 p-4 rounded-card-lg border border-teal/30 bg-teal/5 flex items-start gap-3">

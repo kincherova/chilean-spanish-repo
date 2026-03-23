@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, BookOpen, CheckCircle2, Award, ChevronRight, Star, Sparkles, KeyRound, X, MessageCircle } from 'lucide-react';
 import NavBar from '../components/NavBar';
+import InstallBanner from '../components/InstallBanner';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
@@ -284,6 +285,8 @@ export default function ProfilePage() {
             <span className="font-medium text-sm">Sign out</span>
           </button>
         </div>
+
+        <InstallBanner />
 
         <div className="flex justify-center mt-6 mb-2">
           <Link
