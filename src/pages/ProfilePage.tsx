@@ -136,11 +136,10 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           {[
             { icon: <CheckCircle2 size={18} className="text-green-500" />, value: completedLessons.size, label: 'Lessons done' },
-            { icon: <BookOpen size={18} className="text-teal" />, value: 5, label: 'Modules' },
-            { icon: <Award size={18} className="text-gold" />, value: Math.floor(completedLessons.size * 10), label: 'Points' },
+            { icon: <Award size={18} className="text-gold" />, value: masteredCount, label: 'Phrases mastered' },
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-card-lg p-4 text-center">
               <div className="flex justify-center mb-1">{s.icon}</div>
@@ -266,9 +265,7 @@ export default function ProfilePage() {
               <div>
                 <span className="font-medium text-sm text-navy">My Vocabulary</span>
                 <p className="text-xs text-muted mt-0.5">
-                  {practiceCount > 0 || masteredCount > 0
-                    ? `${practiceCount} to practice · ${masteredCount} mastered`
-                    : 'No tagged words yet'}
+                  {practiceCount > 0 ? `${practiceCount} to practice` : 'No tagged words yet'}
                 </p>
               </div>
             </div>
