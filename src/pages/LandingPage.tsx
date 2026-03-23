@@ -324,15 +324,8 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative bg-[#1a3a5c] py-24 overflow-hidden">
-        {/* Chilean flag stripe accents */}
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-[#d52b1e]" />
-        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-[#d52b1e]" />
-        {/* Subtle star watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
-          <span className="text-white font-bold" style={{ fontSize: '32rem', lineHeight: 1 }}>★</span>
-        </div>
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
+      <section className="bg-[#1a3a5c] py-24">
+        <div className="max-w-3xl mx-auto px-6 text-center">
           <p className="text-[#d52b1e] text-sm font-semibold uppercase tracking-widest mb-4">Free to start</p>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-5">
             Your trip to Chile starts here
