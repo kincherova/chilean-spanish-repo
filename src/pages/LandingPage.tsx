@@ -15,11 +15,11 @@ import {
 
 
 const MODULES = [
-  { icon: <Plane size={18} />, title: 'At the Airport', desc: 'Customs, immigration, asking for help' },
-  { icon: <Car size={18} />, title: 'Taxis & Uber', desc: 'Give directions, ask prices, small talk' },
-  { icon: <Utensils size={18} />, title: 'Cafes & Restaurants', desc: 'Order food, ask the bill, compliment the chef' },
-  { icon: <ShoppingBag size={18} />, title: 'Shops & Markets', desc: 'Bargain, ask for sizes, pay correctly' },
-  { icon: <MessageCircle size={18} />, title: 'Polite Conversation', desc: 'Greet locals, make friends, sound natural' },
+  { icon: <MessageCircle size={18} />, title: 'Polite survival talk', desc: 'Essential phrases for respectful communication' },
+  { icon: <Plane size={18} />, title: 'At the Airport', desc: 'Navigate immigration, customs, and finding your way out of the airport.' },
+  { icon: <Car size={18} />, title: 'Moving around the city', desc: 'Navigate any Chilean city confidently — ask for directions, chat with drivers, and handle any bumps along the way.' },
+  { icon: <Utensils size={18} />, title: 'Cafes & restaurants', desc: 'Order food and drinks like a local' },
+  { icon: <ShoppingBag size={18} />, title: 'Shops & paying', desc: 'Shop confidently and handle transactions' },
 ];
 
 const TESTIMONIALS = [
