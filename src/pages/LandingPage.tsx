@@ -331,7 +331,7 @@ export default function LandingPage() {
             Your trip to Chile starts here
           </h2>
           <p className="text-white/70 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-            The first module is on us — no account needed, no credit card, no pressure.
+            It's time to get ready for your Chilean adventure.
           </p>
           <Link
             to="/modules"
