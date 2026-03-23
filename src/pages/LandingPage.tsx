@@ -22,23 +22,6 @@ const MODULES = [
   { icon: <ShoppingBag size={18} />, title: 'Shops & paying', desc: 'Shop confidently and handle transactions' },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Sarah M.',
-    flag: '🇺🇸',
-    text: 'I was terrified of landing in Santiago not understanding a word. This app changed everything — even the taxi driver was impressed!',
-  },
-  {
-    name: 'James T.',
-    flag: '🇬🇧',
-    text: 'Chilean Spanish is nothing like what I learned in school. The audio lessons with a real Chilean speaker are exactly what I needed.',
-  },
-  {
-    name: 'Anna K.',
-    flag: '🇩🇪',
-    text: 'Finished the course on the flight over. Ordered my first meal in Spanish on day one. Worth every cent.',
-  },
-];
 
 export default function LandingPage() {
   return (
@@ -171,6 +154,15 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+
+          <div className="text-center mt-10">
+            <Link
+              to="/modules"
+              className="inline-flex items-center gap-2.5 bg-coral hover:bg-coral-dark text-white font-bold px-8 py-4 rounded-full text-lg transition-all hover:gap-4 shadow-lg shadow-coral/30"
+            >
+              Start studying now <ArrowRight size={20} />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -237,33 +229,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* SOCIAL PROOF */}
-      <section className="py-20 max-w-5xl mx-auto px-6">
-        <div className="text-center mb-14">
-          <p className="text-coral font-semibold text-sm uppercase tracking-widest mb-4">Travelers love it</p>
-          <h2 className="font-display text-4xl font-bold text-white">
-            From the community
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="text-gold fill-gold" />
-                ))}
-              </div>
-              <p className="text-white/70 text-sm leading-relaxed mb-5">"{t.text}"</p>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{t.flag}</span>
-                <span className="text-white/50 text-sm font-medium">{t.name}</span>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
