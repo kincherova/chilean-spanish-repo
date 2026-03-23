@@ -7,7 +7,6 @@ import {
   BookOpen,
   CheckCircle2,
   Star,
-  MapPin,
   Utensils,
   ShoppingBag,
   Car,
@@ -47,38 +46,24 @@ export default function LandingPage() {
 
       {/* NAV */}
       <nav className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="font-display font-bold text-lg text-white tracking-tight">
-          Survival Chilean Spanish
-        </Link>
-        <Link
-          to="/modules"
-          className="text-sm font-semibold text-white/70 hover:text-white transition-colors"
-        >
-          Open app
-        </Link>
       </nav>
 
       {/* HERO */}
       <section className="max-w-4xl mx-auto px-6 pt-12 pb-20 text-center">
-        <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8">
-          <MapPin size={13} className="text-coral" />
-          <span className="text-white/80 text-sm font-medium">Built for travelers to Chile</span>
-        </div>
-
         <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-          Don't get lost in<br />
-          <span className="text-coral">Chilean Spanish</span>
+          Your trip to Chile<br />
+          <span className="text-coral">starts here</span>
         </h1>
 
         <p className="text-white/60 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          Chilean Spanish is unlike any other. Locals speak fast, drop letters, and use slang you won't find in a textbook. This app teaches you exactly what you need — in short lessons you can finish before your flight lands.
+          Chilean Spanish is unlike any other. Locals speak fast, drop letters, and use slang you won't find in a textbook. This app prepares you for the real thing — so you arrive ready, not lost.
         </p>
 
         <Link
           to="/modules"
           className="inline-flex items-center gap-2.5 bg-coral hover:bg-coral-dark text-white font-bold px-8 py-4 rounded-full text-lg transition-all hover:gap-4 shadow-lg shadow-coral/30"
         >
-          Try it right now for free <ArrowRight size={20} />
+          Start studying now <ArrowRight size={20} />
         </Link>
 
         <p className="text-white/30 text-sm mt-4">No credit card needed — first module is completely free</p>
@@ -434,7 +419,7 @@ export default function LandingPage() {
             to="/modules"
             className="inline-flex items-center gap-2.5 bg-white text-coral font-bold px-10 py-4 rounded-full text-lg transition-all hover:bg-cream hover:gap-4 shadow-xl"
           >
-            Try it right now for free <ArrowRight size={20} />
+            Start studying now <ArrowRight size={20} />
           </Link>
         </div>
       </section>
