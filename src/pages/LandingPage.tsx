@@ -60,24 +60,25 @@ export default function LandingPage() {
             { src: '/IMG_20260322_212050.jpg', label: 'Flashcard practice' },
             { src: '/IMG_20260322_212033.jpg', label: 'This or That quiz' },
           ].map((screen) => (
-            <div key={screen.label} className="flex flex-col items-center gap-3">
-              <div className="relative w-full max-w-[280px] mx-auto">
-                <div className="relative bg-[#111] rounded-[2.5rem] p-[10px] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_30px_60px_rgba(0,0,0,0.6),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
-                  <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[22px] bg-[#111] rounded-b-xl z-10 flex items-center justify-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-[#222] ring-1 ring-white/10" />
-                    <div className="w-[40px] h-[5px] rounded-full bg-[#222]" />
+            <div key={screen.label} className="flex flex-col gap-3">
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-white/5 backdrop-blur-sm">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/[0.04]">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-white/15" />
                   </div>
-                  <div className="rounded-[1.8rem] overflow-hidden">
-                    <img
-                      src={screen.src}
-                      alt={screen.label}
-                      className="w-full h-auto block"
-                    />
+                  <div className="flex-1 mx-3 bg-white/[0.07] rounded-md px-3 py-1 text-[10px] text-white/30 font-mono tracking-wide truncate">
+                    chileanspanish.app
                   </div>
-                  <div className="absolute bottom-[10px] left-1/2 -translate-x-1/2 w-[80px] h-[4px] rounded-full bg-white/20" />
                 </div>
+                <img
+                  src={screen.src}
+                  alt={screen.label}
+                  className="w-full h-auto block"
+                />
               </div>
-              <p className="text-white/50 text-sm font-medium tracking-wide">{screen.label}</p>
+              <p className="text-white/40 text-sm font-medium tracking-wide text-center">{screen.label}</p>
             </div>
           ))}
         </div>
