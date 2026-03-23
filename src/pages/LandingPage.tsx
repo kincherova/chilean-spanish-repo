@@ -324,17 +324,25 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-coral py-20">
-        <div className="max-w-3xl mx-auto px-6 text-center">
+      <section className="relative bg-[#1a3a5c] py-24 overflow-hidden">
+        {/* Chilean flag stripe accents */}
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-[#d52b1e]" />
+        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-[#d52b1e]" />
+        {/* Subtle star watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
+          <span className="text-white font-bold" style={{ fontSize: '32rem', lineHeight: 1 }}>★</span>
+        </div>
+        <div className="relative max-w-3xl mx-auto px-6 text-center">
+          <p className="text-[#d52b1e] text-sm font-semibold uppercase tracking-widest mb-4">Free to start</p>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-5">
             Your trip to Chile starts here
           </h2>
-          <p className="text-white/80 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-            Start for free today. The first module is on us — no account needed, no credit card, no pressure.
+          <p className="text-white/70 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
+            The first module is on us — no account needed, no credit card, no pressure.
           </p>
           <Link
             to="/modules"
-            className="inline-flex items-center gap-2.5 bg-white text-coral font-bold px-10 py-4 rounded-full text-lg transition-all hover:bg-cream hover:gap-4 shadow-xl"
+            className="inline-flex items-center gap-2.5 bg-[#d52b1e] hover:bg-[#b82419] text-white font-bold px-10 py-4 rounded-full text-lg transition-all hover:gap-4 shadow-xl"
           >
             Start studying now <ArrowRight size={20} />
           </Link>
