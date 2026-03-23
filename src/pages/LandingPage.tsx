@@ -73,17 +73,32 @@ export default function LandingPage() {
 
       {/* WHY THIS EXISTS */}
       <section className="bg-white/5 border-y border-white/10 py-20">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <p className="text-coral font-semibold text-sm uppercase tracking-widest mb-4">Why this exists</p>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-6">
-            Chilean Spanish is a world of its own
-          </h2>
-          <p className="text-white/60 text-lg leading-relaxed mb-6">
-            Even fluent Spanish speakers are humbled by Chile. Chileans speak at lightning speed, swallow syllables, and pepper every sentence with local slang. A phrase book won't save you — you need to hear it to understand it.
-          </p>
-          <p className="text-white/60 text-lg leading-relaxed">
-            This app was built for one purpose: to give travelers the exact phrases they need, spoken by a real Chilean, so they can land with confidence and leave with stories — not frustration.
-          </p>
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-coral font-semibold text-sm uppercase tracking-widest mb-4">Why this exists</p>
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">
+              Chilean Spanish is a world of its own
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+            {[
+              { stat: 'Lightning fast', detail: 'Chileans speak faster than almost any other Spanish dialect' },
+              { stat: 'Syllables swallowed', detail: '"¿Cómo estái?" instead of "¿Cómo estás?" — and that\'s just the start' },
+              { stat: 'Local slang', detail: 'Po, cachai, al tiro — words you won\'t find in any textbook' },
+            ].map((item) => (
+              <div key={item.stat} className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+                <p className="font-display text-xl font-bold text-teal mb-2">{item.stat}</p>
+                <p className="text-white/50 text-sm leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-gradient-to-r from-coral/10 to-teal/10 border border-white/10 rounded-2xl p-8 text-center">
+            <p className="text-white/80 text-lg leading-relaxed max-w-2xl mx-auto">
+              A phrase book won't save you — <span className="text-white font-semibold">you need to hear it to understand it.</span> This app gives you the exact phrases travelers need, spoken by a real Chilean, so you land with confidence and leave with stories.
+            </p>
+          </div>
         </div>
       </section>
 
