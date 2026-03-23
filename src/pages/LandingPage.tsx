@@ -69,7 +69,7 @@ export default function LandingPage() {
                     <div className="w-2.5 h-2.5 rounded-full bg-white/15" />
                   </div>
                   <div className="flex-1 mx-3 bg-white/[0.07] rounded-md px-3 py-1 text-[10px] text-white/30 font-mono tracking-wide truncate">
-                    chileanspanish.app
+                    readyforlatam.com
                   </div>
                 </div>
                 <img
