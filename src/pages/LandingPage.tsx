@@ -314,10 +314,10 @@ export default function LandingPage() {
             </p>
             <a
               href="mailto:kincherova@gmail.com"
-              className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200"
             >
               <Mail size={15} />
-              kincherova@gmail.com
+              Contact Irina
             </a>
           </div>
         </div>
