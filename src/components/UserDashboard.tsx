@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Brain } from 'lucide-react';
+import { ArrowRight, Brain, Dumbbell } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
@@ -9,6 +9,7 @@ const TOTAL_UNITS = 28;
 
 interface DashboardStats {
   masteredCount: number;
+  needsPracticeCount: number;
   totalPhrases: number;
   loading: boolean;
 }
@@ -16,7 +17,7 @@ interface DashboardStats {
 export default function UserDashboard() {
   const { user } = useAuth();
   const { completedLessons } = useProgress();
-  const [stats, setStats] = useState<DashboardStats>({ masteredCount: 0, totalPhrases: 0, loading: true });
+  const [stats, setStats] = useState<DashboardStats>({ masteredCount: 0, needsPracticeCount: 0, totalPhrases: 0, loading: true });
   const [profileName, setProfileName] = useState<string | null>(null);
 
   const completedUnits = completedLessons.size;
@@ -25,12 +26,17 @@ export default function UserDashboard() {
     if (!user) return;
 
     async function fetchData() {
-      const [{ count: masteredCount }, { count: totalPhrases }, { data: profile }] = await Promise.all([
+      const [{ count: masteredCount }, { count: needsPracticeCount }, { count: totalPhrases }, { data: profile }] = await Promise.all([
         supabase
           .from('user_flashcard_tags')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user!.id)
           .eq('tag', 'mastered'),
+        supabase
+          .from('user_flashcard_tags')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user!.id)
+          .eq('tag', 'needs_practice'),
         supabase
           .from('flashcards')
           .select('*', { count: 'exact', head: true }),
@@ -41,7 +47,7 @@ export default function UserDashboard() {
           .maybeSingle(),
       ]);
 
-      setStats({ masteredCount: masteredCount ?? 0, totalPhrases: totalPhrases ?? 0, loading: false });
+      setStats({ masteredCount: masteredCount ?? 0, needsPracticeCount: needsPracticeCount ?? 0, totalPhrases: totalPhrases ?? 0, loading: false });
       if (profile?.name) setProfileName(profile.name);
     }
 
@@ -102,6 +108,16 @@ export default function UserDashboard() {
       </Link>
 
       <div className="h-4" />
+
+      {!stats.loading && stats.needsPracticeCount > 0 && (
+        <Link
+          to="/vocabulary/practice?tag=needs_practice"
+          className="inline-flex items-center gap-2 border border-amber-400/50 hover:border-amber-400 text-amber-300 hover:text-amber-200 font-semibold px-8 py-4 rounded-full text-base transition-all hover:gap-3 hover:bg-amber-400/10 mb-3"
+        >
+          <Dumbbell size={18} />
+          Phrases that need more practice
+        </Link>
+      )}
 
       {!stats.loading && stats.masteredCount > 0 && (
         <Link

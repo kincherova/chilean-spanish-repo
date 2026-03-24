@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
@@ -15,6 +15,8 @@ export default function PracticeFlashcardsPage() {
   const { user } = useAuth();
   const { fontSize, cycleFontSize } = useFontSize();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('tag') === 'needs_practice' ? 'needs_practice' : 'mastered';
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [tags, setTags] = useState<Record<string, UserFlashcardTag['tag']>>({});
@@ -24,13 +26,17 @@ export default function PracticeFlashcardsPage() {
   const [showGuestToast, setShowGuestToast] = useState(false);
 
   useEffect(() => {
+    setCurrentIndex(0);
+    setFlipped(false);
+    setFlashcards([]);
+    setLoading(true);
     if (!user) return;
     async function load() {
       const { data: tagRows } = await supabase
         .from('user_flashcard_tags')
         .select('flashcard_id, tag')
         .eq('user_id', user!.id)
-        .eq('tag', 'mastered');
+        .eq('tag', mode);
 
       if (!tagRows || tagRows.length === 0) {
         setFlashcards([]);
@@ -53,7 +59,7 @@ export default function PracticeFlashcardsPage() {
       setLoading(false);
     }
     load();
-  }, [user]);
+  }, [user, mode]);
 
   const card = flashcards[currentIndex];
 
@@ -84,10 +90,15 @@ export default function PracticeFlashcardsPage() {
   const prev = () => { setFlipped(false); setCurrentIndex((i) => Math.max(0, i - 1)); };
   const next = () => { setFlipped(false); setCurrentIndex((i) => Math.min(flashcards.length - 1, i + 1)); };
 
+  const pageTitle = mode === 'needs_practice' ? 'Needs Practice' : 'Mastered Phrases';
+  const emptyMessage = mode === 'needs_practice'
+    ? 'No phrases marked for practice yet. Tag flashcards as "Practice" while studying to review them here.'
+    : 'No mastered phrases yet. Tag flashcards as "Mastered" while studying to review them here.';
+
   if (loading) {
     return (
       <div className="min-h-screen bg-warm-bg">
-        <NavBar back="/vocabulary" title="Practice" />
+        <NavBar back="/vocabulary" title={pageTitle} />
         <div className="flex items-center justify-center pt-20">
           <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
         </div>
@@ -98,9 +109,9 @@ export default function PracticeFlashcardsPage() {
   if (flashcards.length === 0) {
     return (
       <div className="min-h-screen bg-warm-bg">
-        <NavBar back="/vocabulary" title="Practice" />
+        <NavBar back="/vocabulary" title={pageTitle} />
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <p className="text-muted">No mastered phrases yet. Tag flashcards as "Mastered" while studying to review them here.</p>
+          <p className="text-muted">{emptyMessage}</p>
         </div>
       </div>
     );
@@ -110,7 +121,7 @@ export default function PracticeFlashcardsPage() {
 
   return (
     <div className="min-h-screen bg-warm-bg">
-      <NavBar back="/vocabulary" title="Practice" />
+      <NavBar back="/vocabulary" title={pageTitle} />
       <div
         className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-navy text-white text-sm font-medium rounded-full shadow-lg transition-all duration-300 whitespace-nowrap ${
           showGuestToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
