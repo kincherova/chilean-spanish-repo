@@ -132,15 +132,6 @@ export default function PracticeFlashcardsPage() {
           >
             {FONT_SIZE_LABELS[fontSize]}
           </button>
-          <div className="flex gap-1">
-            {flashcards.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setCurrentIndex(i); setFlipped(false); }}
-                className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-amber-400 w-4' : 'bg-muted/30'}`}
-              />
-            ))}
-          </div>
           <button
             onClick={() => { setCurrentIndex(0); setFlipped(false); }}
             className="p-1 hover:text-navy transition-colors"
