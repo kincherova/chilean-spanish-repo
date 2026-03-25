@@ -54,6 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setIsPremium(false);
         resolve();
+      } else {
+        setSession(session);
+        setUser(session.user);
+        (async () => {
+          await fetchPremiumStatus(session.user.id);
+          resolve();
+        })();
       }
     });
 
