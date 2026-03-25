@@ -9,6 +9,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { fs } from '../components/lesson/fontSizeClasses';
 
+interface NextDestination {
+  moduleId: string;
+  unitId: string;
+  lessonId: string;
+  unitTitle: string;
+}
+
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
 export default function FlashcardsPage() {
@@ -24,6 +31,87 @@ export default function FlashcardsPage() {
   const [flipped, setFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showGuestToast, setShowGuestToast] = useState(false);
+  const [nextDest, setNextDest] = useState<NextDestination | null>(null);
+
+  useEffect(() => {
+    async function loadNextDestination() {
+      if (!unitId || !moduleId) return;
+
+      const { data: currentUnit } = await supabase
+        .from('units')
+        .select('order_index, module_id')
+        .eq('id', unitId)
+        .maybeSingle();
+
+      if (!currentUnit) return;
+
+      const { data: nextUnit } = await supabase
+        .from('units')
+        .select('id, title, module_id')
+        .eq('module_id', currentUnit.module_id)
+        .gt('order_index', currentUnit.order_index)
+        .order('order_index')
+        .limit(1)
+        .maybeSingle();
+
+      if (nextUnit) {
+        const { data: firstLesson } = await supabase
+          .from('lessons')
+          .select('id')
+          .eq('unit_id', nextUnit.id)
+          .order('order_index')
+          .limit(1)
+          .maybeSingle();
+
+        if (firstLesson) {
+          setNextDest({ moduleId: nextUnit.module_id, unitId: nextUnit.id, lessonId: firstLesson.id, unitTitle: nextUnit.title });
+          return;
+        }
+      }
+
+      const { data: currentModule } = await supabase
+        .from('modules')
+        .select('order_index')
+        .eq('id', currentUnit.module_id)
+        .maybeSingle();
+
+      if (!currentModule) return;
+
+      const { data: nextModule } = await supabase
+        .from('modules')
+        .select('id')
+        .gt('order_index', currentModule.order_index)
+        .order('order_index')
+        .limit(1)
+        .maybeSingle();
+
+      if (nextModule) {
+        const { data: firstUnit } = await supabase
+          .from('units')
+          .select('id, title')
+          .eq('module_id', nextModule.id)
+          .order('order_index')
+          .limit(1)
+          .maybeSingle();
+
+        if (firstUnit) {
+          const { data: firstLesson } = await supabase
+            .from('lessons')
+            .select('id')
+            .eq('unit_id', firstUnit.id)
+            .order('order_index')
+            .limit(1)
+            .maybeSingle();
+
+          if (firstLesson) {
+            setNextDest({ moduleId: nextModule.id, unitId: firstUnit.id, lessonId: firstLesson.id, unitTitle: firstUnit.title });
+          }
+        }
+      }
+    }
+
+    loadNextDestination();
+  }, [unitId, moduleId]);
 
   useEffect(() => {
     async function load() {
@@ -131,15 +219,24 @@ export default function FlashcardsPage() {
             {' '}in your personal vocabulary list{' '}
             <BookOpen size={14} className="inline-block align-middle text-coral" />
           </p>
+          {nextDest && (
+            <button
+              onClick={() => navigate(`/modules/${nextDest.moduleId}/units/${nextDest.unitId}/lessons/${nextDest.lessonId}`)}
+              className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
+            >
+              Next lesson
+              <ChevronRight size={18} />
+            </button>
+          )}
           <button
             onClick={() => { setFinished(false); setCurrentIndex(0); setFlipped(false); }}
-            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
+            className={`w-full flex items-center justify-center gap-2 font-semibold py-3.5 rounded-card transition-colors ${nextDest ? 'border border-navy/20 text-navy hover:bg-navy/5' : 'bg-coral hover:bg-coral-dark text-white'}`}
           >
             Review cards again
           </button>
           <button
             onClick={() => navigate('/modules')}
-            className="mt-3 text-sm text-muted hover:text-navy transition-colors"
+            className="mt-1 text-sm text-muted hover:text-navy transition-colors"
           >
             Go back to modules
           </button>
