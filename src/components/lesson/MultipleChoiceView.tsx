@@ -127,7 +127,7 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
                 </button>
               )}
             </div>
-            {item.question && (
+            {item.question && item.question !== item.phrase && (
               <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
             )}
           </>
