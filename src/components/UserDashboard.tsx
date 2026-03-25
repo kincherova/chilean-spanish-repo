@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
 
-const TOTAL_UNITS = 28;
+const TOTAL_UNITS = 32;
 
 interface DashboardStats {
   masteredCount: number;
