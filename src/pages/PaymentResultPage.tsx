@@ -47,7 +47,7 @@ const config: Record<ResultType, {
 export default function PaymentResultPage({ result }: { result: ResultType }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { refreshPremium, user } = useAuth();
+  const { refreshPremium, grantPremium, user } = useAuth();
   const [verifying, setVerifying] = useState(result === 'success');
 
   useEffect(() => {
@@ -75,7 +75,12 @@ export default function PaymentResultPage({ result }: { result: ResultType }) {
           }
         );
         if (res.ok) {
-          await refreshPremium();
+          const json = await res.json().catch(() => ({}));
+          if (json.status === 'approved' || json.is_premium) {
+            grantPremium();
+          } else {
+            await refreshPremium();
+          }
         }
       } finally {
         setVerifying(false);

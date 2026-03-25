@@ -42,7 +42,7 @@ function loadMPScript(): Promise<void> {
 }
 
 export default function UpgradePage() {
-  const { user, isPremium, refreshPremium, grantPremium, signIn, signUp, signOut } = useAuth();
+  const { user, isPremium, grantPremium, signIn, signUp, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>('offer');
@@ -185,7 +185,7 @@ export default function UpgradePage() {
                       : data.status === 'pending'
                       ? 'pending'
                       : 'rejected';
-                    if (status === 'approved') await refreshPremium();
+                    if (status === 'approved') grantPremium();
                     setPaymentStatus(status);
                     setStep('result');
                     resolve();
