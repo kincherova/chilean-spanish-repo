@@ -27,11 +27,7 @@ export default function IntroPageView({ page, fontSize }: Props) {
 
   const handleCopy = async () => {
     const text = page.phrases
-      .map((p) => {
-        let line = `${p.spanish} — ${p.english}`;
-        if (p.reply) line += ` (Reply: ${p.reply})`;
-        return line;
-      })
+      .map((p) => `${p.spanish} — ${p.english}`)
       .join('\n');
     await navigator.clipboard.writeText(text);
     setCopied(true);
@@ -76,9 +72,6 @@ export default function IntroPageView({ page, fontSize }: Props) {
                 )}
               </div>
               <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{phrase.english}</p>
-              {phrase.reply && (
-                <p className={`text-muted/70 mt-1 italic ${fs.label(fontSize)}`}>Reply: {phrase.reply}</p>
-              )}
             </div>
             {phrase.audioUrl && (
               <button
