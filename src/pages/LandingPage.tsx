@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -12,6 +13,7 @@ import {
   Car,
   Mail,
 } from 'lucide-react';
+import { trackEvent } from '../lib/analytics';
 
 
 const MODULES = [
@@ -24,6 +26,10 @@ const MODULES = [
 
 
 export default function LandingPage() {
+  useEffect(() => {
+    trackEvent('landing_page_view');
+  }, []);
+
   return (
     <div className="min-h-screen bg-navy text-white font-body">
 

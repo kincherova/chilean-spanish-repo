@@ -4,6 +4,7 @@ import { CheckCircle2, Star, Sparkles, KeyRound, X, ArrowLeft, ArrowRight } from
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { trackEvent } from '../lib/analytics';
 
 declare global {
   interface Window {
@@ -185,7 +186,10 @@ export default function UpgradePage() {
                       : data.status === 'pending'
                       ? 'pending'
                       : 'rejected';
-                    if (status === 'approved') grantPremium();
+                    if (status === 'approved') {
+                      grantPremium();
+                      trackEvent('purchase_completed');
+                    }
                     setPaymentStatus(status);
                     setStep('result');
                     resolve();
@@ -235,6 +239,7 @@ export default function UpgradePage() {
   }, [step]);
 
   const handleContinueToPayment = async () => {
+    trackEvent('checkout_initiated');
     if (user) {
       setStep('brick');
     } else {
