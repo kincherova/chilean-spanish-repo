@@ -4,16 +4,9 @@ type AnalyticsEvent = 'landing_page_view' | 'checkout_initiated' | 'purchase_com
 
 export async function trackEvent(event: AnalyticsEvent, metadata?: Record<string, unknown>) {
   try {
-    let userId: string | null = null;
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      userId = session?.user?.id ?? null;
-    } catch {
-      userId = null;
-    }
     await supabase.from('analytics_events').insert({
       event,
-      user_id: userId,
+      user_id: null,
       metadata: metadata ?? null,
     });
   } catch {
