@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Car,
   Mail,
+  Sparkles,
 } from 'lucide-react';
 import { trackEvent } from '../lib/analytics';
 
@@ -22,6 +23,7 @@ const MODULES = [
   { icon: <Car size={18} />, title: 'Moving around the city', desc: 'Navigate any Chilean city confidently — ask for directions, chat with drivers, and handle any bumps along the way.' },
   { icon: <Utensils size={18} />, title: 'Cafes & restaurants', desc: 'Order food and drinks like a local' },
   { icon: <ShoppingBag size={18} />, title: 'Shops & paying', desc: 'Shop confidently and handle transactions' },
+  { icon: <Sparkles size={18} />, title: 'Modismos chilenos 🇨🇱', desc: 'Learn to recognize Chilean slang and understand its culture. Bonus module for curious learners.', bonus: true },
 ];
 
 
@@ -165,24 +167,29 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <p className="text-coral font-semibold text-sm uppercase tracking-widest mb-4">What you'll learn</p>
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-white">
-              5 modules, real-life situations
+              6 modules, real-life situations
             </h2>
           </div>
 
           <div className="space-y-3">
             {MODULES.map((mod, i) => (
-              <div key={mod.title} className="flex items-center gap-5 bg-white/5 border border-white/10 rounded-2xl px-6 py-5">
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/70 flex-shrink-0">
+              <div key={mod.title} className={`flex items-center gap-5 border rounded-2xl px-6 py-5 ${'bonus' in mod && mod.bonus ? 'bg-teal/5 border-teal/20' : 'bg-white/5 border-white/10'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${'bonus' in mod && mod.bonus ? 'bg-teal/15 text-teal' : 'bg-white/10 text-white/70'}`}>
                   {mod.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-white/30 font-medium mb-0.5">Module {i + 1}</p>
+                  <p className="text-xs text-white/30 font-medium mb-0.5">{'bonus' in mod && mod.bonus ? 'Bonus module' : `Module ${i + 1}`}</p>
                   <h3 className="font-semibold text-white text-base">{mod.title}</h3>
                   <p className="text-white/40 text-sm">{mod.desc}</p>
                 </div>
                 {i === 0 && (
                   <span className="text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full flex-shrink-0">
                     Free
+                  </span>
+                )}
+                {'bonus' in mod && mod.bonus && (
+                  <span className="text-xs font-semibold text-teal bg-teal/10 border border-teal/20 px-2.5 py-1 rounded-full flex-shrink-0">
+                    Bonus
                   </span>
                 )}
               </div>
@@ -286,7 +293,7 @@ export default function LandingPage() {
 
             <ul className="space-y-3 mb-8 text-left">
               {[
-                'All 5 modules unlocked',
+                'All 6 modules unlocked',
                 'Full lesson library (28 lessons)',
                 'All flashcard sets (298 phrases)',
                 'Native Chilean audio throughout',
