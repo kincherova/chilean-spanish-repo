@@ -164,7 +164,7 @@ export default function VocabularyPage() {
             {tab === 'needs_practice' && (
               <div className="mb-4">
                 <button
-                  onClick={() => navigate('/vocabulary/practice')}
+                  onClick={() => navigate('/vocabulary/practice?tag=needs_practice')}
                   className="w-full flex items-center justify-center gap-2 py-3.5 bg-amber-400 hover:bg-amber-500 text-white font-semibold rounded-card-lg transition-colors shadow-sm"
                 >
                   <Zap size={17} />
@@ -175,7 +175,7 @@ export default function VocabularyPage() {
             {tab === 'mastered' && (
               <div className="mb-4">
                 <button
-                  onClick={() => navigate('/vocabulary/practice')}
+                  onClick={() => navigate('/vocabulary/practice?tag=mastered')}
                   className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-card-lg transition-colors shadow-sm"
                 >
                   <BrainCircuit size={17} />
