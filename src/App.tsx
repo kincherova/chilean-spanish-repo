@@ -17,6 +17,7 @@ import UpgradePage from './pages/UpgradePage';
 import AboutIrinaPage from './pages/AboutIrinaPage';
 import LandingPage from './pages/LandingPage';
 import AnalyticsDashboardPage from './pages/AnalyticsDashboardPage';
+import AdminAudioPage from './pages/AdminAudioPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="/about-irina" element={<AboutIrinaPage />} />
               <Route path="/chileanspanish" element={<LandingPage />} />
               <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboardPage /></ProtectedRoute>} />
+              <Route path="/admin-audio" element={<ProtectedRoute><AdminAudioPage /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </FontSizeProvider>
