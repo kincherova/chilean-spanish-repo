@@ -55,7 +55,7 @@ export default function DialoguePracticeView({ page, fontSize }: Props) {
                     </p>
                   )}
                   <p className={`font-medium ${fs.body(fontSize)} ${isLocal ? 'text-white' : 'text-navy'}`}>{line.spanish}</p>
-                  {line.english && (
+                  {line.english && !isTourist && (
                     <p className={`mt-1 italic ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : 'text-muted'}`}>{line.english}</p>
                   )}
                 </button>
