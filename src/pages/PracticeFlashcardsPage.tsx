@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, RotateCcw, Volume2, Tag, BookOpen } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
-import { playAudio, speakSpanish } from '../lib/audio';
+import { playAudio, preloadAudio, speakSpanish } from '../lib/audio';
 import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -55,6 +55,7 @@ export default function PracticeFlashcardsPage() {
         const tagMap: Record<string, UserFlashcardTag['tag']> = {};
         tagRows.forEach((r) => { tagMap[r.flashcard_id] = r.tag; });
         setTags(tagMap);
+        cardsData.forEach((c) => { if (c.audio_url) preloadAudio(c.audio_url); });
       }
       setLoading(false);
     }

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Flashcard } from '../../types/database';
 import { FontSize, fs } from './fontSizeClasses';
-import { playAudio, speakSpanish } from '../../lib/audio';
+import { playAudio, preloadAudio, speakSpanish } from '../../lib/audio';
 
 interface Props {
   flashcards: Flashcard[];
@@ -13,6 +13,10 @@ interface Props {
 export default function FlashcardsView({ flashcards, fontSize }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+
+  useEffect(() => {
+    flashcards.forEach((c) => { if (c.audio_url) preloadAudio(c.audio_url); });
+  }, [flashcards]);
 
   const card = flashcards[currentIndex];
 
