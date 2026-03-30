@@ -55,8 +55,7 @@ export default function DialogueView({ page, fontSize }: Props) {
         {page.dialogue?.map((line, i) => {
           const isLocal = line.speaker === 'local';
           const isWaiter = line.speaker === 'waiter';
-          const isTourist = !isLocal && !isWaiter;
-          const isRight = isTourist;
+          const isRight = !isLocal && !isWaiter;
 
           return (
             <div key={i} className={`flex ${isRight ? 'justify-end' : 'justify-start'}`}>
@@ -71,7 +70,7 @@ export default function DialogueView({ page, fontSize }: Props) {
                   </p>
                 )}
                 <p className={`font-medium ${fs.body(fontSize)} ${isLocal ? 'text-white' : 'text-navy'}`}>{line.spanish}</p>
-                {line.english && !isTourist && (
+                {line.english && (
                   <p className={`mt-1 italic ${fs.label(fontSize)} ${isLocal ? 'text-white/60' : 'text-muted'}`}>{line.english}</p>
                 )}
               </div>
