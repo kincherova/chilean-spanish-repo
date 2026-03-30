@@ -33,8 +33,10 @@ export default function DialoguePracticeView({ page, fontSize }: Props) {
                   onClick={() => toggle(i)}
                   className="max-w-[80%] rounded-card-lg px-4 py-3 bg-green-100 border-2 border-dashed border-green-300 flex items-center gap-2 text-green-700 hover:bg-green-200 transition-colors"
                 >
-                  <Eye size={15} className="flex-shrink-0" />
-                  <span className={`font-medium ${fs.body(fontSize)}`}>Tap to see your reply</span>
+                  <Eye size={15} className="flex-shrink-0 opacity-60" />
+                  <span className={`font-medium ${fs.body(fontSize)}`}>
+                    {line.english || 'Tap to see your reply'}
+                  </span>
                 </button>
               ) : (
                 <button
