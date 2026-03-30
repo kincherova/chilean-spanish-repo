@@ -16,17 +16,13 @@ import RecapView from '../components/lesson/RecapView';
 import PhraseListView from '../components/lesson/PhraseListView';
 import RecallView from '../components/lesson/RecallView';
 
-const FONT_SIZE_LABELS: Record<string, string> = {
-  normal: 'A',
-  large: 'A+',
-  xlarge: 'A++',
-};
+const FONT_SIZES = ['normal', 'large', 'xlarge'] as const;
 
 export default function LessonPage() {
   const { moduleId, unitId, lessonId } = useParams<{ moduleId: string; unitId: string; lessonId: string }>();
   const navigate = useNavigate();
   const { markLessonComplete } = useProgress();
-  const { fontSize, cycleFontSize } = useFontSize();
+  const { fontSize, setFontSize } = useFontSize();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
@@ -120,17 +116,20 @@ export default function LessonPage() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <button
-            onClick={cycleFontSize}
-            title="Cycle text size"
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border ${
-              fontSize === 'normal'
-                ? 'text-muted border-gray-200 hover:border-coral/40 hover:text-navy bg-white/60'
-                : 'text-coral border-coral/40 bg-coral/10'
-            }`}
-          >
-            {FONT_SIZE_LABELS[fontSize]}
-          </button>
+          <div className="flex items-end gap-0.5 border border-gray-200 rounded-lg px-1.5 py-1 bg-white/60">
+            {FONT_SIZES.map((size, i) => (
+              <button
+                key={size}
+                onClick={() => setFontSize(size)}
+                title={size === 'normal' ? 'Small text' : size === 'large' ? 'Medium text' : 'Large text'}
+                className={`font-bold leading-none transition-all ${
+                  fontSize === size ? 'text-coral' : 'text-muted hover:text-navy'
+                } ${i === 0 ? 'text-[10px]' : i === 1 ? 'text-[13px]' : 'text-[17px]'}`}
+              >
+                A
+              </button>
+            ))}
+          </div>
           <button onClick={handleClose} className="p-1.5 rounded-lg text-muted hover:text-navy hover:bg-white/60 transition-colors">
             <X size={18} />
           </button>

@@ -5,6 +5,7 @@ type FontSize = 'normal' | 'large' | 'xlarge';
 interface FontSizeContextType {
   fontSize: FontSize;
   cycleFontSize: () => void;
+  setFontSize: (size: FontSize) => void;
 }
 
 const FontSizeContext = createContext<FontSizeContextType | null>(null);
@@ -28,7 +29,7 @@ export function FontSizeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FontSizeContext.Provider value={{ fontSize, cycleFontSize }}>
+    <FontSizeContext.Provider value={{ fontSize, cycleFontSize, setFontSize }}>
       {children}
     </FontSizeContext.Provider>
   );
