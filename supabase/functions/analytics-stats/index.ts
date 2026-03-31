@@ -22,11 +22,11 @@ Deno.serve(async (req: Request) => {
     const days = parseInt(url.searchParams.get("days") ?? "30");
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-    const events = ["landing_page_view", "checkout_initiated", "purchase_completed"];
+    const analyticsEvents = ["landing_page_view", "checkout_initiated"];
     const totals: Record<string, number> = {};
     const daily: Record<string, Record<string, number>> = {};
 
-    for (const event of events) {
+    for (const event of analyticsEvents) {
       const { count } = await supabase
         .from("analytics_events")
         .select("*", { count: "exact", head: true })
@@ -35,17 +35,37 @@ Deno.serve(async (req: Request) => {
       totals[event] = count ?? 0;
     }
 
-    const { data: rows } = await supabase
+    const { count: purchaseCount } = await supabase
+      .from("payments")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "approved")
+      .gte("created_at", since);
+    totals["purchase_completed"] = purchaseCount ?? 0;
+
+    const { data: analyticsRows } = await supabase
       .from("analytics_events")
       .select("event, created_at")
-      .in("event", events)
+      .in("event", analyticsEvents)
       .gte("created_at", since)
       .order("created_at", { ascending: true });
 
-    for (const row of rows ?? []) {
+    for (const row of analyticsRows ?? []) {
       const day = row.created_at.slice(0, 10);
       if (!daily[day]) daily[day] = {};
       daily[day][row.event] = (daily[day][row.event] ?? 0) + 1;
+    }
+
+    const { data: paymentRows } = await supabase
+      .from("payments")
+      .select("created_at")
+      .eq("status", "approved")
+      .gte("created_at", since)
+      .order("created_at", { ascending: true });
+
+    for (const row of paymentRows ?? []) {
+      const day = row.created_at.slice(0, 10);
+      if (!daily[day]) daily[day] = {};
+      daily[day]["purchase_completed"] = (daily[day]["purchase_completed"] ?? 0) + 1;
     }
 
     return new Response(JSON.stringify({ totals, daily }), {
