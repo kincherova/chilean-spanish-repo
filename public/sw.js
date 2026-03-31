@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chilean-spanish-v1774976067129';
+const CACHE_NAME = 'chilean-spanish-v1774977646879';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -23,6 +23,13 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('connect.facebook.net') ||
+      event.request.url.includes('facebook.com/tr?') ||
+      event.request.url.includes('facebook.net')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
