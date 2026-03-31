@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chilean-spanish-v1774977682287';
+const CACHE_NAME = 'chilean-spanish-v1774978174926';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -23,16 +23,17 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('connect.facebook.net') ||
-      event.request.url.includes('facebook.com/tr?') ||
-      event.request.url.includes('facebook.net')) {
-    event.respondWith(fetch(event.request));
+  const url = event.request.url;
+
+  if (url.includes('connect.facebook.net') ||
+      url.includes('facebook.com') ||
+      url.includes('facebook.net') ||
+      url.includes('fbcdn.net')) {
+    event.respondWith(fetch(event.request.clone()).catch(() => fetch(event.request)));
     return;
   }
 
   if (event.request.method !== 'GET') return;
-
-  const url = new URL(event.request.url);
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
