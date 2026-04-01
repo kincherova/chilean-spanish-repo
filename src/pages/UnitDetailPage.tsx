@@ -10,6 +10,13 @@ import { fs } from '../components/lesson/fontSizeClasses';
 
 const FONT_SIZE_LABELS = { normal: 'A', large: 'A+', xlarge: 'A++' };
 
+function renderBold(text: string) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i} className="font-semibold text-amber-900">{part}</strong> : part
+  );
+}
+
 export default function UnitDetailPage() {
   const { moduleId, unitId } = useParams<{ moduleId: string; unitId: string }>();
   const [unit, setUnit] = useState<Unit | null>(null);
@@ -70,7 +77,7 @@ export default function UnitDetailPage() {
                   {tipSplit[1] && (
                     <div className={`mt-3 flex gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 ${fs.bodySmall(fontSize)}`}>
                       <span className="text-amber-500 font-bold flex-shrink-0">Tip:</span>
-                      <p className="text-amber-800 leading-relaxed">{tipSplit[1].trim()}</p>
+                      <p className="text-amber-800 leading-relaxed">{renderBold(tipSplit[1].trim())}</p>
                     </div>
                   )}
                 </>
