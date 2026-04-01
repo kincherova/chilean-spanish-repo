@@ -62,7 +62,20 @@ export default function UnitDetailPage() {
           <div>
             <p className={`text-muted font-medium mb-1 uppercase tracking-wider ${fs.label(fontSize)}`}>{module.title}</p>
             <h1 className="font-display text-2xl font-bold text-navy mb-2">{unit.title}</h1>
-            <p className={`text-muted leading-relaxed ${fs.bodySmall(fontSize)}`}>{unit.description}</p>
+            {unit.description && (() => {
+              const tipSplit = unit.description.split(/\n\nTip:/);
+              return (
+                <>
+                  <p className={`text-muted leading-relaxed ${fs.bodySmall(fontSize)}`}>{tipSplit[0]}</p>
+                  {tipSplit[1] && (
+                    <div className={`mt-3 flex gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 ${fs.bodySmall(fontSize)}`}>
+                      <span className="text-amber-500 font-bold flex-shrink-0">Tip:</span>
+                      <p className="text-amber-800 leading-relaxed">{tipSplit[1].trim()}</p>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
           <button
             onClick={cycleFontSize}
