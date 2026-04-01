@@ -68,6 +68,7 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
   const [done, setDone] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
   const [accentWarning, setAccentWarning] = useState<string | null>(null);
+  const [firstTryScore, setFirstTryScore] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const item = page.items[currentItem];
@@ -106,6 +107,7 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     setInputValue(val);
 
     if (isAccepted(val, item.spanish)) {
+      if (itemState === 'idle') setFirstTryScore((s) => s + 1);
       setItemState('correct');
       onCorrect();
       setTimeout(() => advance(), 800);
@@ -148,20 +150,43 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
     onWrong();
   };
 
+  const handleRestart = () => {
+    setCurrentItem(0);
+    setInputValue('');
+    setItemState('idle');
+    setDone(false);
+    setShowCorrect(false);
+    setAccentWarning(null);
+    setFirstTryScore(0);
+  };
+
   if (done) {
+    const total = page.items.length;
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <CheckCircle2 size={48} className="text-green-500 mb-4" />
         <h2 className={`font-display font-bold text-navy mb-2 ${fs.heading(fontSize)}`}>
           ¡Muy bien{userName ? `, ${userName}` : ''}!
         </h2>
-        <p className={`text-muted mb-6 ${fs.bodySmall(fontSize)}`}>Keep going!</p>
-        <button
-          onClick={onNext}
-          className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
-        >
-          Next exercise <ChevronRight size={18} />
-        </button>
+        <div className="flex items-baseline gap-1 mb-1">
+          <span className="font-display text-5xl font-bold text-navy">{firstTryScore}</span>
+          <span className="text-2xl text-muted font-medium">/ {total}</span>
+        </div>
+        <p className="text-muted text-sm mb-8">correct on the first try</p>
+        <div className="w-full flex flex-col gap-3">
+          <button
+            onClick={onNext}
+            className="w-full flex items-center justify-center gap-2 bg-coral hover:bg-coral-dark text-white font-semibold py-3.5 rounded-card transition-colors"
+          >
+            Next exercise <ChevronRight size={18} />
+          </button>
+          <button
+            onClick={handleRestart}
+            className="w-full flex items-center justify-center gap-2 border border-navy/20 text-navy hover:bg-navy/5 font-semibold py-3.5 rounded-card transition-colors"
+          >
+            Do the exercise again
+          </button>
+        </div>
       </div>
     );
   }
