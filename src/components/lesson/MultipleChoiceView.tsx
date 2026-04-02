@@ -128,38 +128,38 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
       <p className={`text-muted mb-1 ${fs.bodySmall(fontSize)}`}>Read the phrase and pick the correct answer.</p>
       <p className={`text-muted/60 mb-6 ${fs.label(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
-      <div className="bg-white rounded-card-lg p-5 mb-5">
-        {item.phrase && (
-          <>
-            <div className="flex items-center justify-between mb-2">
-              <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
-              {item.audioUrl && (
-                <button
-                  onClick={() => {
-                    const thisItem = currentItem;
-                    audioItemRef.current = thisItem;
-                    setAudioPlaying(true);
-                    playAudio(item.audioUrl!, () => {
-                      if (audioItemRef.current === thisItem) setAudioPlaying(false);
-                    });
-                  }}
-                  className={`p-2 rounded-full transition-colors flex-shrink-0 ${
-                    audioPlaying
-                      ? 'bg-green-700 text-white'
-                      : 'bg-green-100 hover:bg-green-200 text-green-600'
-                  }`}
-                >
-                  <Volume2 size={16} />
-                </button>
-              )}
-            </div>
-            {item.question && item.question !== item.phrase && (
-              <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
+      {item.phrase && (
+        <div className="bg-white rounded-card-lg p-5 mb-5">
+          <div className="flex items-center justify-between mb-2">
+            <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
+            {item.audioUrl && (
+              <button
+                onClick={() => {
+                  const thisItem = currentItem;
+                  audioItemRef.current = thisItem;
+                  setAudioPlaying(true);
+                  playAudio(item.audioUrl!, () => {
+                    if (audioItemRef.current === thisItem) setAudioPlaying(false);
+                  });
+                }}
+                className={`p-2 rounded-full transition-colors flex-shrink-0 ${
+                  audioPlaying
+                    ? 'bg-green-700 text-white'
+                    : 'bg-green-100 hover:bg-green-200 text-green-600'
+                }`}
+              >
+                <Volume2 size={16} />
+              </button>
             )}
-          </>
-        )}
-        {!item.phrase && <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.question}</p>}
-      </div>
+          </div>
+          {item.question && item.question !== item.phrase && (
+            <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
+          )}
+        </div>
+      )}
+      {!item.phrase && (
+        <p className={`font-display font-bold text-navy mb-5 ${fs.heading(fontSize)}`}>{item.question}</p>
+      )}
 
       <div key={currentItem} className="space-y-2 mb-4">
         {item.options.map((opt, idx) => {
