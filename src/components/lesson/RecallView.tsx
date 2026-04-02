@@ -206,8 +206,8 @@ export default function RecallView({ page, fontSize, onCorrect, onWrong, onNext 
       <p className={`text-muted/60 mb-6 ${fs.label(fontSize)}`}>{currentItem + 1} / {page.items.length}</p>
 
       <div className="bg-white rounded-card-lg p-5 mb-5">
-        <p className={`text-muted mb-1 ${fs.label(fontSize)}`}>How do you say this in Spanish?</p>
-        <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.english}</p>
+        <p className={`text-muted mb-2 ${fs.label(fontSize)}`}>How do you say this in Spanish?</p>
+        <p className={`font-display font-bold text-navy ${fontSize === 'xlarge' ? 'text-5xl' : fontSize === 'large' ? 'text-4xl' : 'text-3xl'}`}>{item.english}</p>
       </div>
 
       {itemState === 'try2' && !accentWarning && (
