@@ -179,7 +179,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-white/30 font-medium mb-0.5">{'bonus' in mod && mod.bonus ? 'Bonus module' : `Module ${i + 1}`}</p>
-                  <h3 className="font-semibold text-white text-base">{mod.title}</h3>
+                  <h3 className="font-semibold text-teal text-base">{mod.title}</h3>
                   <p className="text-white/40 text-sm">{mod.desc}</p>
                 </div>
                 {i === 0 && (
