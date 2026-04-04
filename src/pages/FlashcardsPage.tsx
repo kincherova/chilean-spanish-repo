@@ -248,13 +248,6 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen bg-warm-bg">
       <NavBar back={`/modules/${moduleId}/units/${unitId}`} title="Flashcards" />
-      <div
-        className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-navy text-white text-sm font-medium rounded-full shadow-lg transition-all duration-300 whitespace-nowrap ${
-          showGuestToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-        }`}
-      >
-        Register to mark the phrase
-      </div>
       <div className="max-w-sm mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 text-sm text-muted">
           <span>{currentIndex + 1} / {flashcards.length}</span>
@@ -324,7 +317,7 @@ export default function FlashcardsPage() {
           </div>
         </button>
 
-        <div className="flex gap-2 mb-6 justify-center">
+        <div className="flex gap-2 justify-center mb-1">
           {(['needs_practice', 'mastered'] as const).map((t) => (
             <button
               key={t}
@@ -341,6 +334,9 @@ export default function FlashcardsPage() {
               {t === 'needs_practice' ? 'Practice' : 'Mastered'}
             </button>
           ))}
+        </div>
+        <div className={`flex justify-center mt-2 mb-4 transition-opacity duration-300 ${showGuestToast ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <p className="text-xs text-coral font-medium">Register to mark the phrase</p>
         </div>
 
         <div className="flex items-center justify-between gap-3">
