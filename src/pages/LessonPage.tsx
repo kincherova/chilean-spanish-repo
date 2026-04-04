@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { Lesson, Flashcard, LessonPage as LessonPageType, DialoguePracticePage, PhraseListPage, RecallPage } from '../types/database';
 import { useProgress } from '../contexts/ProgressContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { useAuth } from '../contexts/AuthContext';
 import OverviewPageView from '../components/lesson/OverviewPageView';
 import IntroPageView from '../components/lesson/IntroPageView';
 import MultipleChoiceView from '../components/lesson/MultipleChoiceView';
@@ -15,6 +16,9 @@ import DialoguePracticeView from '../components/lesson/DialoguePracticeView';
 import RecapView from '../components/lesson/RecapView';
 import PhraseListView from '../components/lesson/PhraseListView';
 import RecallView from '../components/lesson/RecallView';
+import RegistrationPromptModal from '../components/RegistrationPromptModal';
+
+const MODULE1_UNIT1_ID = 'bac8627a-e89e-400a-b54e-217e4f379fc2';
 
 const FONT_SIZES = ['normal', 'large', 'xlarge'] as const;
 
@@ -23,6 +27,7 @@ export default function LessonPage() {
   const navigate = useNavigate();
   const { markLessonComplete } = useProgress();
   const { fontSize, setFontSize } = useFontSize();
+  const { user } = useAuth();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
@@ -30,6 +35,8 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [quizAnswered, setQuizAnswered] = useState(0);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [pendingFlashcardsNav, setPendingFlashcardsNav] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -71,13 +78,34 @@ export default function LessonPage() {
   const page = pages[currentPage] as LessonPageType | undefined;
   const progress = totalPages > 0 ? ((currentPage + 1) / totalPages) * 100 : 0;
 
+  const goToFlashcards = () => {
+    navigate(`/modules/${moduleId}/units/${unitId}/flashcards`);
+  };
+
   const handleNext = async () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage((p) => p + 1);
     } else {
       await markLessonComplete(lesson.id, quizAnswered > 0 ? Math.round((score / quizAnswered) * 100) : undefined);
-      navigate(`/modules/${moduleId}/units/${unitId}/flashcards`);
+      if (!user && unitId === MODULE1_UNIT1_ID) {
+        setPendingFlashcardsNav(true);
+        setShowRegistrationModal(true);
+      } else {
+        goToFlashcards();
+      }
     }
+  };
+
+  const handleModalClose = () => {
+    setShowRegistrationModal(false);
+    if (pendingFlashcardsNav) {
+      goToFlashcards();
+    }
+  };
+
+  const handleModalRegistered = () => {
+    setShowRegistrationModal(false);
+    goToFlashcards();
   };
 
   const handleBack = () => {
@@ -101,6 +129,12 @@ export default function LessonPage() {
 
   return (
     <div className="min-h-screen bg-warm-bg flex flex-col">
+      {showRegistrationModal && (
+        <RegistrationPromptModal
+          onClose={handleModalClose}
+          onRegistered={handleModalRegistered}
+        />
+      )}
       <div className="sticky top-0 z-50 bg-warm-bg/95 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           {currentPage > 0 ? (

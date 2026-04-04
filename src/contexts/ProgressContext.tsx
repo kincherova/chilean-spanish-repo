@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, ReactNode, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
@@ -27,9 +27,23 @@ function saveLocalProgress(lessons: Set<string>) {
   } catch {}
 }
 
+async function migrateLocalProgressToSupabase(userId: string) {
+  const local = loadLocalProgress();
+  if (local.size === 0) return;
+  const rows = [...local].map((lessonId) => ({
+    user_id: userId,
+    lesson_id: lessonId,
+    completed_at: new Date().toISOString(),
+    score: null,
+  }));
+  await supabase.from('user_progress').upsert(rows, { onConflict: 'user_id,lesson_id' });
+  localStorage.removeItem(LOCAL_PROGRESS_KEY);
+}
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+  const prevUserId = useRef<string | null>(null);
 
   const refreshProgress = useCallback(async () => {
     if (!user) {
@@ -47,7 +61,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   useEffect(() => {
-    refreshProgress();
+    const wasGuest = prevUserId.current === null;
+    const isNowLoggedIn = user !== null;
+
+    if (wasGuest && isNowLoggedIn) {
+      (async () => {
+        await migrateLocalProgressToSupabase(user.id);
+        await refreshProgress();
+      })();
+    } else {
+      refreshProgress();
+    }
+
+    prevUserId.current = user?.id ?? null;
   }, [refreshProgress]);
 
   const markLessonComplete = async (lessonId: string, score?: number) => {
