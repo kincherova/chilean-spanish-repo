@@ -300,7 +300,7 @@ export default function FlashcardsPage() {
               {card?.audio_url && (
                 <button
                   onClick={(e) => { e.stopPropagation(); playAudio(card.audio_url!); }}
-                  className="mt-5 p-2.5 bg-coral/10 hover:bg-coral/20 rounded-full text-coral transition-colors"
+                  className="mt-5 p-2.5 bg-green-500/10 hover:bg-green-500/20 rounded-full text-green-500 transition-colors"
                 >
                   <Volume2 size={18} />
                 </button>
