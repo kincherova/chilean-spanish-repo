@@ -230,13 +230,13 @@ export default function FlashcardsPage() {
           )}
           <button
             onClick={() => { setFinished(false); setCurrentIndex(0); setFlipped(false); }}
-            className={`w-full flex items-center justify-center gap-2 font-semibold py-3.5 rounded-card transition-colors ${nextDest ? 'border border-navy/20 text-navy hover:bg-navy/5' : 'bg-coral hover:bg-coral-dark text-white'}`}
+            className={`w-full flex items-center justify-center gap-2 font-semibold py-3.5 rounded-card transition-colors mt-3 ${nextDest ? 'border border-navy/20 text-navy hover:bg-navy/5' : 'bg-coral hover:bg-coral-dark text-white'}`}
           >
             Review cards again
           </button>
           <button
             onClick={() => navigate('/modules')}
-            className="mt-1 text-sm text-muted hover:text-navy transition-colors"
+            className="mt-4 text-sm text-muted hover:text-navy transition-colors"
           >
             Go back to modules
           </button>
