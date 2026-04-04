@@ -5,11 +5,15 @@ import { FontSize, fs } from './fontSizeClasses';
 interface Props {
   page: OverviewPage;
   fontSize: FontSize;
+  unitTitle?: string;
 }
 
-export default function OverviewPageView({ page, fontSize }: Props) {
+export default function OverviewPageView({ page, fontSize, unitTitle }: Props) {
   return (
     <div className="space-y-5">
+      {unitTitle && (
+        <p className={`font-semibold text-coral uppercase tracking-wider ${fs.label(fontSize)}`}>{unitTitle}</p>
+      )}
       <h1 className={`font-display font-bold text-navy mb-2 ${fs.heading(fontSize)}`}>{page.title}</h1>
 
       <div className="bg-green-50 border border-green-200 rounded-card-lg p-5 flex gap-3">

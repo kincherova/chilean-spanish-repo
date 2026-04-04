@@ -30,6 +30,7 @@ export default function LessonPage() {
   const { user } = useAuth();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [unitTitle, setUnitTitle] = useState<string>('');
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -41,12 +42,14 @@ export default function LessonPage() {
   useEffect(() => {
     async function load() {
       if (!lessonId || !unitId) return;
-      const [{ data: lessonData }, { data: flashcardsData }] = await Promise.all([
+      const [{ data: lessonData }, { data: flashcardsData }, { data: unitData }] = await Promise.all([
         supabase.from('lessons').select('*').eq('id', lessonId).maybeSingle(),
         supabase.from('flashcards').select('*').eq('unit_id', unitId).order('order_index'),
+        supabase.from('units').select('title').eq('id', unitId).maybeSingle(),
       ]);
       if (lessonData) setLesson(lessonData);
       if (flashcardsData) setFlashcards(flashcardsData);
+      if (unitData) setUnitTitle(unitData.title);
       setLoading(false);
     }
     load();
@@ -173,7 +176,7 @@ export default function LessonPage() {
       <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 flex flex-col">
         <div className="flex-1">
           {page?.type === 'overview' && (
-            <OverviewPageView page={page} fontSize={fontSize} />
+            <OverviewPageView page={page} fontSize={fontSize} unitTitle={unitTitle} />
           )}
           {page?.type === 'intro' && (
             <IntroPageView page={page} fontSize={fontSize} />
