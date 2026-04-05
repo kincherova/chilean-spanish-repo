@@ -81,6 +81,30 @@ const tips: Record<string, LanguageTip> = {
     heading: 'Words from Mapudungun',
     body: 'Many everyday Chilean words come from Mapudungun, the language of the Mapuche people. You\'ll hear them in normal conversation without anyone thinking twice.<ul><li><em>guagua</em> (wáwa) — baby</li><li><em>guata</em> (wáta) — belly / stomach</li><li><em>puchos</em> — cigarette butts (or cigarettes generally)</li></ul>',
   },
+
+  // Module 6, Unit 1 — People, Relationships & Everyday Life
+  '6c14a552-8414-43b6-a2a0-e5d61590938e': {
+    heading: 'The words that run Chilean streets',
+    body: '<strong>Weón</strong> and <strong>wea</strong> are probably the two most versatile words in Chilean Spanish. Weón can mean <em>dude/mate</em> when used warmly between friends, or <em>idiot/a**hole</em> when said with irritation — context and tone are everything. Wea is equally flexible: it can mean a <em>thing</em>, a <em>situation</em>, a <em>mess</em>, or just fill space when someone can\'t find the right word. You\'ll hear them constantly. Don\'t be alarmed — it usually just means people are being casual with you.',
+  },
+
+  // Module 6, Unit 2 — Reactions, Feelings & Everyday Expressions
+  'dbc27ed3-ec26-458e-b67b-9b880eebecb5': {
+    heading: 'Swearing is just… normal here',
+    body: 'In Chile, swearing is woven into everyday conversation at all social levels — from market vendors to CEOs speaking in casual social events. If someone drops a <em>mierda</em> or a <em>wea</em> in a casual chat with you, they\'re not being rude or aggressive. It\'s simply how Chileans talk when they\'re relaxed and comfortable. Think of it as a sign that they feel at ease around you, not that something has gone wrong.',
+  },
+
+  // Module 6, Unit 3 — Social Life & Parties
+  'c1a02933-b46c-4c1e-8329-ec3bb3ad82b2': {
+    heading: 'Two accents, one country',
+    body: 'Chile has a notable accent split along socio-economic lines. <em>Cuicos</em> (upper-class Chileans) tend to pronounce the <em>ll</em> and <em>y</em> sounds more like the letter <em>y</em>, and speak with a cleaner, more clipped rhythm. <em>Flaites</em> (working-class street culture) often pronounce the <em>ch</em> sound as <em>sh</em> — so <em>Chile</em> becomes <em>Shile</em> and <em>noche</em> becomes <em>noshe</em>. You\'ll notice this especially in Santiago. Neither is more common — they\'re both authentically Chilean.',
+  },
+
+  // Module 6, Unit 4 — Swearing & Rude Language
+  '1bec3409-1710-4e94-b875-0093a8b9e95c': {
+    heading: 'English words, Chilean style',
+    body: 'Chileans have adopted a surprising number of English words into everyday speech — but with their own pronunciation. <em>Heavy</em> becomes <strong>jevi</strong> (<em>"qué jevi eso"</em> — "that\'s intense/cool"). You\'ll also hear <em>el after</em> (the after-party), <em>happy hour</em> and <em>el living</em> (the living room). These words are used naturally and aren\'t considered foreign — they\'ve been fully absorbed into Chilean Spanish. If you drop one, locals will appreciate that you\'re picking up the local flavour.',
+  },
 };
 
 export function getTipForUnit(unitId: string): LanguageTip | null {
