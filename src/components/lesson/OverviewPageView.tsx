@@ -12,7 +12,7 @@ export default function OverviewPageView({ page, fontSize, unitTitle }: Props) {
   return (
     <div className="space-y-5">
       {unitTitle && (
-        <p className={`font-semibold text-coral uppercase tracking-wider ${fs.label(fontSize)}`}>{unitTitle}</p>
+        <p className={`font-semibold text-teal uppercase tracking-wider ${fs.label(fontSize)}`}>{unitTitle}</p>
       )}
       <h1 className={`font-display font-bold text-navy mb-2 ${fs.heading(fontSize)}`}>{page.title}</h1>
 
