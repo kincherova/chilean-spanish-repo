@@ -8,6 +8,7 @@ import { Flashcard, UserFlashcardTag } from '../types/database';
 import { useAuth } from '../contexts/AuthContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { fs } from '../components/lesson/fontSizeClasses';
+import { getTipForUnit } from '../lib/languageTips';
 
 interface NextDestination {
   moduleId: string;
@@ -204,6 +205,8 @@ export default function FlashcardsPage() {
 
   const currentTag = card ? tags[card.id] : null;
 
+  const tip = unitId ? getTipForUnit(unitId) : null;
+
   if (finished) {
     return (
       <div className="min-h-screen bg-warm-bg">
@@ -219,6 +222,23 @@ export default function FlashcardsPage() {
             {' '}in your personal vocabulary list{' '}
             <BookOpen size={14} className="inline-block align-middle text-coral" />
           </p>
+          {tip && (
+            <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 text-left mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                  <BookOpen size={14} className="text-teal-600" />
+                </div>
+                <span className="text-xs font-semibold text-teal-700 uppercase tracking-wide">
+                  Quick Language Tip
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-navy mb-2">{tip.heading}</p>
+              <div
+                className="text-sm text-gray-700 leading-relaxed [&_strong]:font-semibold [&_em]:italic [&_em]:text-gray-800"
+                dangerouslySetInnerHTML={{ __html: tip.body }}
+              />
+            </div>
+          )}
           {nextDest && (
             <button
               onClick={() => navigate(`/modules/${nextDest.moduleId}/units/${nextDest.unitId}/lessons/${nextDest.lessonId}`)}
