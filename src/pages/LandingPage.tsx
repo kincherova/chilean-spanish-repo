@@ -57,7 +57,25 @@ export default function LandingPage() {
           Start studying now <ArrowRight size={20} />
         </Link>
 
-        <p className="text-white/30 text-sm mt-4">No credit card needed — first module is completely free</p>
+        <p className="text-white/30 text-sm mt-4">First module is completely free</p>
+
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          {[
+            { quote: "I highly recommend it, especially if you're just starting out and want to expand your vocabulary quickly and in an engaging way.", name: 'Oliver', country: 'New Zealand' },
+            { quote: "It's a great app — simple and easy to use, which is really important. It has everything you need for a trip to Chile.", name: 'Andrew', country: 'US' },
+            { quote: 'Very interesting; the topics are well-chosen and cover a variety of situations. 100% recommended 👍', name: 'Tatiana', country: 'Germany' },
+          ].map((t) => (
+            <div key={t.name} className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-left">
+              <div className="flex gap-0.5 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={12} style={{ color: '#c9a961', fill: '#c9a961' }} />
+                ))}
+              </div>
+              <p className="text-white/70 text-sm leading-relaxed mb-4">"{t.quote}"</p>
+              <p className="text-white/40 text-xs font-semibold">{t.name}, {t.country}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* APP SCREENSHOTS */}
