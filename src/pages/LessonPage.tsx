@@ -15,6 +15,7 @@ import DialogueView from '../components/lesson/DialogueView';
 import DialoguePracticeView from '../components/lesson/DialoguePracticeView';
 import RecapView from '../components/lesson/RecapView';
 import PhraseListView from '../components/lesson/PhraseListView';
+import { getTipForUnit } from '../lib/languageTips';
 import RecallView from '../components/lesson/RecallView';
 import RegistrationPromptModal from '../components/RegistrationPromptModal';
 
@@ -200,7 +201,7 @@ export default function LessonPage() {
             <DialoguePracticeView page={page} fontSize={fontSize} />
           )}
           {page?.type === 'recap' && (
-            <RecapView page={page} lessonTitle={lesson.title} fontSize={fontSize} />
+            <RecapView page={page} lessonTitle={lesson.title} fontSize={fontSize} tip={unitId ? getTipForUnit(unitId) : null} />
           )}
           {page?.type === 'recall' && (
             <RecallView page={page as RecallPage} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
