@@ -30,7 +30,7 @@ export default function RecapView({ page, lessonTitle, fontSize: _fontSize, tip 
               <BookOpen size={14} className="text-teal-600" />
             </div>
             <span className="text-xs font-semibold text-teal-700 uppercase tracking-wide">
-              In case you want to understand Spanish better
+              Quick Language Tip
             </span>
           </div>
           <p className="text-sm font-semibold text-navy mb-2">{tip.heading}</p>
