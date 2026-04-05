@@ -174,7 +174,7 @@ export default function LessonPage() {
       </div>
 
       <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 flex flex-col">
-        <div className="flex-1">
+        <div className={page?.type === 'overview' ? undefined : 'flex-1'}>
           {page?.type === 'overview' && (
             <OverviewPageView page={page} fontSize={fontSize} unitTitle={unitTitle} />
           )}
