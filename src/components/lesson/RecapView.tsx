@@ -26,10 +26,10 @@ export default function RecapView({ page, lessonTitle, fontSize: _fontSize, tip 
       {tip && (
         <div className="w-full max-w-sm bg-amber-50 border border-amber-200 rounded-2xl p-5 text-left">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <BookOpen size={14} className="text-amber-600" />
+            <div className="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+              <BookOpen size={14} className="text-teal-600" />
             </div>
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+            <span className="text-xs font-semibold text-teal-700 uppercase tracking-wide">
               In case you want to understand Spanish better
             </span>
           </div>
