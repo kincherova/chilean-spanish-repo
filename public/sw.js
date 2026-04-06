@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chilean-spanish-v1775484030272';
+const CACHE_NAME = 'chilean-spanish-v1775485021091';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
