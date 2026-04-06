@@ -1,22 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Star, Sparkles, KeyRound, ArrowLeft, Loader2 } from 'lucide-react';
+import { CheckCircle2, Star, Sparkles, KeyRound, ArrowLeft } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { trackEvent } from '../lib/analytics';
+import MercadoPagoCardForm from '../components/MercadoPagoCardForm';
 
-declare global {
-  interface Window {
-    MercadoPago: new (publicKey: string, options?: { locale: string }) => {
-      bricks: () => {
-        create: (brick: string, containerId: string, settings: object) => Promise<unknown>;
-      };
-    };
-  }
-}
-
-type Step = 'offer' | 'auth' | 'checkout' | 'processing' | 'code-signup';
+type Step = 'offer' | 'auth' | 'checkout' | 'code-signup';
 type AuthMode = 'login' | 'signup';
 
 export default function UpgradePage() {
@@ -35,148 +26,69 @@ export default function UpgradePage() {
   const [codeError, setCodeError] = useState<string | null>(null);
 
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [brickReady, setBrickReady] = useState(false);
-
-  const brickControllerRef = useRef<{ unmount: () => void } | null>(null);
-  const brickMountedRef = useRef(false);
-
-  const mountBrick = async (userEmail: string) => {
-    if (brickMountedRef.current) return;
-    brickMountedRef.current = true;
-    setBrickReady(false);
-    setCheckoutError(null);
-
-    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
-    if (!publicKey || !window.MercadoPago) {
-      setCheckoutError('Payment system unavailable. Please try again later.');
-      brickMountedRef.current = false;
-      return;
-    }
-
-    const mp = new window.MercadoPago(publicKey, { locale: 'en-US' });
-    const bricksBuilder = mp.bricks();
-
-    try {
-      const controller = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', {
-        initialization: {
-          amount: 19,
-          payer: {
-            email: userEmail,
-            identification: {
-              type: 'Otro',
-              number: '0',
-            },
-          },
-        },
-        customization: {
-          visual: {
-            hideFormTitle: true,
-            style: {
-              theme: 'default',
-              customVariables: {
-                baseColor: '#f59e0b',
-                formBackgroundColor: '#ffffff',
-                borderRadiusMedium: '12px',
-                borderRadiusLarge: '16px',
-                inputVerticalPadding: '12px',
-              },
-            },
-          },
-          paymentMethods: {
-            maxInstallments: 1,
-          },
-        },
-        callbacks: {
-          onReady: () => setBrickReady(true),
-          onError: (error: { message?: string }) => {
-            console.error('Brick error', error);
-            setCheckoutError('Payment form failed to load. Please refresh and try again.');
-            brickMountedRef.current = false;
-          },
-          onSubmit: async (cardFormData: {
-            token: string;
-            installments: number;
-            payment_method_id: string;
-            issuer_id: string;
-            payer: { email: string; identification?: { type: string; number: string } };
-          }) => {
-            setStep('processing');
-            try {
-              const { data: { session } } = await supabase.auth.getSession();
-              if (!session?.access_token) {
-                setCheckoutError('Session expired. Please sign in again.');
-                setStep('checkout');
-                return;
-              }
-
-              const res = await fetch(
-                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/process-payment`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.access_token}`,
-                  },
-                  body: JSON.stringify({
-                    token: cardFormData.token,
-                    installments: cardFormData.installments,
-                    payment_method_id: cardFormData.payment_method_id,
-                    issuer_id: cardFormData.issuer_id,
-                    transaction_amount: 19,
-                    payer: {
-                      email: cardFormData.payer.email,
-                      identification: cardFormData.payer.identification,
-                    },
-                  }),
-                }
-              );
-
-              const data = await res.json();
-
-              if (!res.ok) {
-                setCheckoutError(data.error || 'Payment failed. Please try again.');
-                setStep('checkout');
-                return;
-              }
-
-              if (data.status === 'approved') {
-                grantPremium();
-                navigate('/payment/success');
-              } else if (data.status === 'pending' || data.status === 'in_process') {
-                navigate('/payment/pending');
-              } else {
-                setCheckoutError('Payment was not approved. Please check your card details and try again.');
-                setStep('checkout');
-              }
-            } catch {
-              setCheckoutError('Something went wrong. Please try again.');
-              setStep('checkout');
-            }
-          },
-        },
-      }) as { unmount: () => void };
-
-      brickControllerRef.current = controller;
-    } catch (err) {
-      console.error('Failed to create brick', err);
-      setCheckoutError('Payment form failed to load. Please refresh and try again.');
-      brickMountedRef.current = false;
-    }
-  };
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (step === 'checkout' && user) {
-      brickMountedRef.current = false;
-      mountBrick(user.email || '');
+    if (step !== 'checkout') {
+      setIsProcessing(false);
     }
-    return () => {
-      if (step !== 'checkout' && brickControllerRef.current) {
-        brickControllerRef.current.unmount();
-        brickControllerRef.current = null;
-        brickMountedRef.current = false;
+  }, [step]);
+
+  const handleCardSubmit = async (token: string, paymentMethodId: string, issuerId: string, installments: number) => {
+    setIsProcessing(true);
+    setCheckoutError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setCheckoutError('Session expired. Please sign in again.');
+        setIsProcessing(false);
+        return;
       }
-    };
-  }, [step, user]);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/process-payment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            token,
+            installments,
+            payment_method_id: paymentMethodId,
+            issuer_id: issuerId,
+            transaction_amount: 19,
+            payer: {
+              email: user?.email || '',
+              identification: { type: 'Otro', number: '0' },
+            },
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCheckoutError(data.error || 'Payment failed. Please try again.');
+        setIsProcessing(false);
+        return;
+      }
+
+      if (data.status === 'approved') {
+        grantPremium();
+        navigate('/payment/success');
+      } else if (data.status === 'pending' || data.status === 'in_process') {
+        navigate('/payment/pending');
+      } else {
+        setCheckoutError('Payment was not approved. Please check your card details and try again.');
+        setIsProcessing(false);
+      }
+    } catch {
+      setCheckoutError('Something went wrong. Please try again.');
+      setIsProcessing(false);
+    }
+  };
 
   const handleContinueToPayment = () => {
     trackEvent('checkout_initiated');
@@ -306,18 +218,6 @@ export default function UpgradePage() {
     );
   }
 
-  if (step === 'processing') {
-    return (
-      <div className="min-h-screen bg-warm-bg flex items-center justify-center px-4">
-        <div className="text-center">
-          <Loader2 size={32} className="text-amber-500 animate-spin mx-auto mb-3" />
-          <p className="text-navy font-semibold text-sm">Processing your payment...</p>
-          <p className="text-muted text-xs mt-1">Please don't close this page.</p>
-        </div>
-      </div>
-    );
-  }
-
   if (step === 'checkout') {
     return (
       <div className="min-h-screen bg-warm-bg">
@@ -341,15 +241,10 @@ export default function UpgradePage() {
           )}
 
           <div className="bg-white rounded-card-lg shadow-sm overflow-hidden">
-            {!brickReady && !checkoutError && (
-              <div className="flex items-center justify-center py-16 gap-3 text-muted text-sm">
-                <Loader2 size={20} className="animate-spin text-amber-400" />
-                Loading payment form...
-              </div>
-            )}
-            <div
-              id="cardPaymentBrick_container"
-              className={brickReady ? 'block' : 'hidden'}
+            <MercadoPagoCardForm
+              onSubmit={handleCardSubmit}
+              onError={(msg) => setCheckoutError(msg)}
+              isProcessing={isProcessing}
             />
           </div>
 
