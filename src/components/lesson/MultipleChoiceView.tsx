@@ -130,10 +130,8 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
 
       {item.phrase && (
         <div className="bg-white rounded-card-lg p-5 mb-5">
-          <div className="flex items-center justify-between">
-            <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>
-              {item.question && item.question !== item.phrase ? item.question : item.phrase}
-            </p>
+          <div className="flex items-center justify-between mb-2">
+            <p className={`font-display font-bold text-navy ${fs.heading(fontSize)}`}>{item.phrase}</p>
             {item.audioUrl && (
               <button
                 onClick={() => {
@@ -154,6 +152,9 @@ export default function MultipleChoiceView({ page, fontSize, onCorrect, onWrong,
               </button>
             )}
           </div>
+          {item.question && item.question !== item.phrase && (
+            <p className={`text-muted ${fs.bodySmall(fontSize)}`}>{item.question}</p>
+          )}
         </div>
       )}
       {!item.phrase && (
