@@ -148,8 +148,8 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Card number</label>
         <div
           id="mp-card-number"
-          className="w-full border border-gray-200 rounded-xl px-3 py-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
-          style={{ minHeight: 46 }}
+          className="w-full border border-gray-200 rounded-xl px-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
+          style={{ height: 46 }}
         />
         {cardNumberError && <p className="mt-1 text-xs text-red-500">{cardNumberError}</p>}
       </div>
@@ -159,8 +159,8 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Expiration</label>
           <div
             id="mp-expiration"
-            className="w-full border border-gray-200 rounded-xl px-3 py-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
-            style={{ minHeight: 46 }}
+            className="w-full border border-gray-200 rounded-xl px-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
+            style={{ height: 46 }}
           />
           {expirationError && <p className="mt-1 text-xs text-red-500">{expirationError}</p>}
         </div>
@@ -168,8 +168,8 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Security code</label>
           <div
             id="mp-security-code"
-            className="w-full border border-gray-200 rounded-xl px-3 py-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
-            style={{ minHeight: 46 }}
+            className="w-full border border-gray-200 rounded-xl px-3 bg-white focus-within:ring-2 focus-within:ring-amber-400/40 focus-within:border-amber-400 transition-colors"
+            style={{ height: 46 }}
           />
           {securityCodeError && <p className="mt-1 text-xs text-red-500">{securityCodeError}</p>}
         </div>
