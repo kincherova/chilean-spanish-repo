@@ -60,7 +60,13 @@ export default function UpgradePage() {
       const controller = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', {
         initialization: {
           amount: 19,
-          payer: { email: userEmail },
+          payer: {
+            email: userEmail,
+            identification: {
+              type: 'Otro',
+              number: '0',
+            },
+          },
         },
         customization: {
           visual: {
