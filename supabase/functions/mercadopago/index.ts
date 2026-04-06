@@ -20,11 +20,11 @@ async function createPreference(userId: string, userEmail: string, appUrl: strin
     items: [
       {
         id: "premium-access",
-        title: "Survival Chilean Spanish — Premium Access",
-        description: "Unlock all 5 modules and every lesson",
+        title: "Survival Chilean Spanish — Full Access",
+        description: "Unlock all modules and every lesson. Lifetime access.",
         quantity: 1,
-        currency_id: "CLP",
-        unit_price: 19900,
+        currency_id: "USD",
+        unit_price: 19,
       },
     ],
     payer: {
@@ -38,6 +38,10 @@ async function createPreference(userId: string, userEmail: string, appUrl: strin
     auto_return: "approved",
     external_reference: userId,
     notification_url: `${SUPABASE_URL}/functions/v1/mercadopago/webhook`,
+    payment_methods: {
+      excluded_payment_types: [],
+      installments: 1,
+    },
   };
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
@@ -224,8 +228,8 @@ Deno.serve(async (req: Request) => {
         user_id: user.id,
         mp_preference_id: preference.id,
         status: "pending",
-        amount: 19900,
-        currency: "CLP",
+        amount: 19,
+        currency: "USD",
       });
 
       return new Response(

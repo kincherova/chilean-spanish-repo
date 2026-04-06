@@ -1,46 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Star, Sparkles, KeyRound, X, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Star, Sparkles, KeyRound, ArrowLeft, Loader2 } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { trackEvent } from '../lib/analytics';
 
-declare global {
-  interface Window {
-    MercadoPago: new (publicKey: string, options: object) => {
-      bricks: () => {
-        create: (type: string, containerId: string, settings: object) => Promise<{ unmount: () => void }>;
-      };
-    };
-    paymentBrickController?: { unmount: () => void };
-  }
-}
-
-type Step = 'offer' | 'auth' | 'brick' | 'result' | 'code-signup';
+type Step = 'offer' | 'auth' | 'paying' | 'code-signup';
 type AuthMode = 'login' | 'signup';
-type PaymentStatus = 'approved' | 'pending' | 'rejected';
-
-function loadMPScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (window.MercadoPago) { resolve(); return; }
-
-    const existing = document.querySelector('script[src="https://sdk.mercadopago.com/js/v2"]');
-    if (existing) {
-      const poll = setInterval(() => {
-        if (window.MercadoPago) { clearInterval(poll); resolve(); }
-      }, 50);
-      setTimeout(() => { clearInterval(poll); reject(new Error('MercadoPago SDK timed out')); }, 10000);
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://sdk.mercadopago.com/js/v2';
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Failed to load MercadoPago SDK'));
-    document.head.appendChild(script);
-  });
-}
 
 export default function UpgradePage() {
   const { user, isPremium, grantPremium, signIn, signUp, signOut } = useAuth();
@@ -57,191 +24,46 @@ export default function UpgradePage() {
   const [accessCode, setAccessCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
 
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
-  const [brickError, setBrickError] = useState<string | null>(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  const MP_PUBLIC_KEY = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY as string;
-
-  useEffect(() => {
-    if (step !== 'brick') return;
-
-    let cancelled = false;
-
-    const unmountBrick = () => {
-      if (window.paymentBrickController) {
-        try { window.paymentBrickController.unmount(); } catch (_) { /* ignore */ }
-        window.paymentBrickController = undefined;
+  const launchCheckout = async () => {
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setCheckoutError('Session expired. Please sign in again.');
+        setCheckoutLoading(false);
+        return;
       }
-    };
-
-    const mount = async () => {
-      unmountBrick();
-
-      try {
-        await loadMPScript();
-        if (cancelled) return;
-
-        if (!MP_PUBLIC_KEY) {
-          setBrickError('Payment system is not configured. Please contact support.');
-          return;
-        }
-
-        const { data: { session } } = await supabase.auth.getSession();
-        if (cancelled) return;
-        if (!session?.access_token) {
-          setBrickError('Session expired. Please sign in again.');
-          return;
-        }
-
-        const container = document.getElementById('paymentBrick_container');
-        if (!container) {
-          setBrickError('Payment form container not found. Please try again.');
-          return;
-        }
-        container.innerHTML = '';
-        if (cancelled) return;
-
-        const token = session.access_token;
-        const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'en-US' });
-        const bricksBuilder = mp.bricks();
-
-        const settings = {
-          initialization: {
-            amount: 19,
-            payer: {
-              firstName: '',
-              lastName: '',
-              email: user?.email ?? '',
-            },
+      const appUrl = window.location.origin;
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/create-preference`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
           },
-          customization: {
-            visual: {
-              style: { theme: 'flat' },
-            },
-            paymentMethods: {
-              creditCard: 'all',
-              debitCard: 'all',
-              ticket: 'all',
-              bankTransfer: 'all',
-              maxInstallments: 1,
-            },
-          },
-          callbacks: {
-            onReady: () => {
-              const hideIdentification = () => {
-                const container = document.getElementById('paymentBrick_container');
-                if (!container) return;
-                const style = document.createElement('style');
-                style.textContent = `
-                  [data-testid="identification-section"],
-                  [data-testid="cardholderIdentification"],
-                  [class*="identification"],
-                  [id*="identification"] {
-                    display: none !important;
-                  }
-                `;
-                container.appendChild(style);
-
-                container.querySelectorAll('iframe').forEach((iframe) => {
-                  try {
-                    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-                    if (doc) {
-                      const iStyle = doc.createElement('style');
-                      iStyle.textContent = `
-                        [data-testid="identification-section"],
-                        [data-testid="cardholderIdentification"],
-                        [class*="identification"],
-                        [id*="identification"] {
-                          display: none !important;
-                        }
-                      `;
-                      doc.head?.appendChild(iStyle);
-                    }
-                  } catch (_) {}
-                });
-              };
-              hideIdentification();
-              setTimeout(hideIdentification, 500);
-              setTimeout(hideIdentification, 1500);
-            },
-            onSubmit: ({ formData }: { selectedPaymentMethod: string; formData: object }) => {
-              return new Promise<void>((resolve, reject) => {
-                (async () => {
-                  try {
-                    const res = await fetch(
-                      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mercadopago/process-payment`,
-                      {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify(formData),
-                      }
-                    );
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || 'Payment failed');
-                    const status: PaymentStatus = data.status === 'approved'
-                      ? 'approved'
-                      : data.status === 'pending'
-                      ? 'pending'
-                      : 'rejected';
-                    if (status === 'approved') {
-                      grantPremium();
-                      trackEvent('purchase_completed');
-                    }
-                    setPaymentStatus(status);
-                    setStep('result');
-                    resolve();
-                  } catch (err) {
-                    setBrickError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
-                    reject();
-                  }
-                })();
-              });
-            },
-            onError: (error: unknown) => {
-              console.error('Brick error:', error);
-              const msg = error && typeof error === 'object' && 'message' in error
-                ? String((error as { message: unknown }).message)
-                : JSON.stringify(error);
-              setBrickError(`Payment form error: ${msg}`);
-            },
-          },
-        };
-
-        if (cancelled) return;
-
-        const controller = await bricksBuilder.create(
-          'payment',
-          'paymentBrick_container',
-          settings
-        );
-
-        if (cancelled) {
-          try { controller.unmount(); } catch (_) { /* ignore */ }
-        } else {
-          window.paymentBrickController = controller;
+          body: JSON.stringify({ appUrl }),
         }
-      } catch (err) {
-        if (!cancelled) {
-          setBrickError(err instanceof Error ? err.message : 'Failed to load payment form.');
-        }
-      }
-    };
-
-    mount();
-
-    return () => {
-      cancelled = true;
-      unmountBrick();
-    };
-  }, [step]);
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not start checkout');
+      const url = data.init_point || data.sandbox_init_point;
+      if (!url) throw new Error('No checkout URL returned');
+      window.location.href = url;
+    } catch (err) {
+      setCheckoutError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setCheckoutLoading(false);
+    }
+  };
 
   const handleContinueToPayment = async () => {
     trackEvent('checkout_initiated');
     if (user) {
-      setStep('brick');
+      await launchCheckout();
     } else {
       setStep('auth');
       setAuthMode('signup');
@@ -261,7 +83,8 @@ export default function UpgradePage() {
       if (error) { setAuthError('Invalid email or password'); setAuthLoading(false); return; }
     }
     setAuthLoading(false);
-    setStep('brick');
+    setStep('paying');
+    await launchCheckout();
   };
 
   const handleAccessCode = async () => {
@@ -369,62 +192,27 @@ export default function UpgradePage() {
     );
   }
 
-  if (step === 'result' && paymentStatus) {
-    const isApproved = paymentStatus === 'approved';
-    const isPending = paymentStatus === 'pending';
+  if (step === 'paying') {
     return (
-      <div className="min-h-screen bg-warm-bg">
-        <NavBar back="/modules" title="Payment" />
-        <div className="max-w-md mx-auto px-4 py-12 text-center">
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 ${isApproved ? 'bg-green-100' : isPending ? 'bg-amber-100' : 'bg-red-100'}`}>
-            {isApproved
-              ? <CheckCircle2 size={40} className="text-green-600" />
-              : isPending
-              ? <Star size={40} className="text-amber-500" />
-              : <X size={40} className="text-red-500" />}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-navy mb-2">
-            {isApproved ? 'Payment approved!' : isPending ? 'Payment pending' : 'Payment failed'}
-          </h1>
-          <p className="text-muted text-sm mb-8">
-            {isApproved
-              ? 'You now have full access to all modules and lessons.'
-              : isPending
-              ? "Your payment is being processed. We'll unlock your access as soon as it's confirmed."
-              : 'Something went wrong. You can try again from your profile.'}
-          </p>
-          <button
-            onClick={() => navigate('/modules')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-navy text-white font-semibold text-sm hover:bg-navy/90 transition-colors"
-          >
-            {isApproved ? 'Start learning' : 'Go to modules'}
-            <ArrowRight size={15} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 'brick') {
-    return (
-      <div className="min-h-screen bg-warm-bg">
-        <NavBar back={() => setStep('offer')} title="Complete payment" />
-        <div className="max-w-lg mx-auto px-4 py-8">
-          <div className="bg-white rounded-card-lg shadow-sm p-4 mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-navy">Survival Chilean Spanish</p>
-              <p className="text-xs text-muted">Full access — all modules unlocked</p>
-            </div>
-            <p className="text-lg font-bold text-navy">$19 USD</p>
-          </div>
-
-          {brickError && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
-              {brickError}
-            </div>
+      <div className="min-h-screen bg-warm-bg flex items-center justify-center px-4">
+        <div className="text-center">
+          {checkoutError ? (
+            <>
+              <p className="text-red-600 text-sm mb-4">{checkoutError}</p>
+              <button
+                onClick={() => { setStep('offer'); setCheckoutError(null); }}
+                className="px-5 py-2.5 rounded-full bg-navy text-white text-sm font-semibold hover:bg-navy/90 transition-colors"
+              >
+                Go back
+              </button>
+            </>
+          ) : (
+            <>
+              <Loader2 size={32} className="text-amber-500 animate-spin mx-auto mb-3" />
+              <p className="text-navy font-semibold text-sm">Redirecting to checkout...</p>
+              <p className="text-muted text-xs mt-1">You'll be taken to MercadoPago to complete your payment.</p>
+            </>
           )}
-
-          <div id="paymentBrick_container" className="bg-white rounded-card-lg shadow-sm min-h-[200px]" />
         </div>
       </div>
     );
@@ -663,12 +451,20 @@ export default function UpgradePage() {
               <span className="text-xs font-semibold bg-amber-500 text-white px-2 py-0.5 rounded-full">60% off</span>
             </div>
 
+            {checkoutError && (
+              <div className="mb-3 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+                {checkoutError}
+              </div>
+            )}
             <button
               onClick={handleContinueToPayment}
-              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+              disabled={checkoutLoading}
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              <Star size={15} className="fill-white" />
-              Get full access
+              {checkoutLoading
+                ? <Loader2 size={15} className="animate-spin" />
+                : <Star size={15} className="fill-white" />}
+              {checkoutLoading ? 'Redirecting...' : 'Get full access'}
             </button>
 
             <div className="mt-4 border-t border-amber-200 pt-4">
