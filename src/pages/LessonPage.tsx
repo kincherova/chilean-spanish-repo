@@ -32,6 +32,7 @@ export default function LessonPage() {
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [unitTitle, setUnitTitle] = useState<string>('');
+  const [unitType, setUnitType] = useState<string>('');
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -46,11 +47,14 @@ export default function LessonPage() {
       const [{ data: lessonData }, { data: flashcardsData }, { data: unitData }] = await Promise.all([
         supabase.from('lessons').select('*').eq('id', lessonId).maybeSingle(),
         supabase.from('flashcards').select('*').eq('unit_id', unitId).order('order_index'),
-        supabase.from('units').select('title').eq('id', unitId).maybeSingle(),
+        supabase.from('units').select('title, unit_type').eq('id', unitId).maybeSingle(),
       ]);
       if (lessonData) setLesson(lessonData);
       if (flashcardsData) setFlashcards(flashcardsData);
-      if (unitData) setUnitTitle(unitData.title);
+      if (unitData) {
+        setUnitTitle(unitData.title);
+        setUnitType(unitData.unit_type ?? '');
+      }
       setLoading(false);
     }
     load();
@@ -186,7 +190,7 @@ export default function LessonPage() {
             <PhraseListView page={page as PhraseListPage} fontSize={fontSize} flashcards={flashcards} />
           )}
           {page?.type === 'multiple_choice' && (
-            <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
+            <MultipleChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} vocabularyQuizMode={unitType === 'vocabulary'} />
           )}
           {page?.type === 'audio_choice' && (
             <AudioChoiceView page={page} fontSize={fontSize} onCorrect={handleQuizCorrect} onWrong={handleQuizWrong} onNext={handleNext} />
