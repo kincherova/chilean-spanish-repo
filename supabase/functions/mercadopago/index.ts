@@ -173,8 +173,8 @@ async function handleProcessPayment(req: Request) {
     mp_payment_id: String(payment.id),
     mp_preference_id: String(payment.order?.id ?? ""),
     status,
-    amount: payment.transaction_amount ?? 9990,
-    currency: payment.currency_id ?? "CLP",
+    amount: payment.transaction_amount ?? 19,
+    currency: payment.currency_id ?? "USD",
   });
 
   if (status === "approved") {

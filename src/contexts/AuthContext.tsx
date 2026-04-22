@@ -50,35 +50,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // onAuthStateChange fires INITIAL_SESSION synchronously covering the getSession case,
-    // so we only use getSession to handle the no-session (logged-out) fast path.
+    // getSession initialises auth state on page load.
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         setSession(null);
         setUser(null);
         setIsPremium(false);
         resolve();
+      } else {
+        setSession(session);
+        setUser(session.user);
+        (async () => {
+          await fetchPremiumStatus(session.user.id);
+          resolve();
+        })();
       }
-      // If session exists, onAuthStateChange INITIAL_SESSION will handle it.
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // onAuthStateChange handles subsequent sign-in / sign-out events.
+    // INITIAL_SESSION fires on load too, but premiumFetchGen ensures only the
+    // last fetch wins, so duplicate calls are safe.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Skip INITIAL_SESSION — already handled by getSession above.
+      if (event === 'INITIAL_SESSION') return;
+
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
         if (skipNextPremiumFetch.current) {
           skipNextPremiumFetch.current = false;
-          resolve();
         } else {
           (async () => {
             await fetchPremiumStatus(session.user.id);
-            resolve();
           })();
         }
       } else {
         premiumFetchGen.current++;
         setIsPremium(false);
-        resolve();
       }
     });
 

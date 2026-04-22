@@ -59,6 +59,7 @@ export default function UpgradePage() {
             payment_method_id: paymentMethodId,
             issuer_id: issuerId,
             transaction_amount: 19,
+            currency_id: 'USD',
             payer: {
               email: user?.email || '',
               identification: { type: 'Otro', number: identificationNumber },
