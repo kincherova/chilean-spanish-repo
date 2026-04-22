@@ -104,6 +104,20 @@ async function handleWebhook(req: Request) {
   return new Response("ok", { status: 200, headers: corsHeaders });
 }
 
+async function getUsdToClpRate(): Promise<number> {
+  try {
+    const res = await fetch(
+      "https://api.mercadopago.com/v1/exchange_rates?from=USD&to=CLP",
+      { headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` } }
+    );
+    if (!res.ok) throw new Error("exchange rate fetch failed");
+    const data = await res.json();
+    return data.rate as number;
+  } catch {
+    return 950;
+  }
+}
+
 async function handleProcessPayment(req: Request) {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) {
@@ -133,13 +147,47 @@ async function handleProcessPayment(req: Request) {
     });
   }
 
+  // MercadoPago Chile (MLC) only accepts CLP. Convert $19 USD to CLP at live rate.
+  const rate = await getUsdToClpRate();
+  const amountCLP = Math.round(19 * rate);
+
+  console.log(`USD→CLP rate: ${rate}, charging ${amountCLP} CLP`);
+
+  const payerEmail = formData.payer?.email || user.email;
+  const nameParts = ((user.user_metadata?.name as string) || payerEmail?.split("@")[0] || "").split(" ");
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || firstName;
+
   const paymentBody = {
-    ...formData,
+    token: formData.token,
+    installments: formData.installments ?? 1,
+    payment_method_id: formData.payment_method_id,
+    issuer_id: formData.issuer_id || undefined,
+    transaction_amount: amountCLP,
+    description: "Survival Chilean Spanish — Full Access",
     external_reference: user.id,
     notification_url: `${SUPABASE_URL}/functions/v1/mercadopago/webhook`,
     payer: {
-      ...formData.payer,
-      email: formData.payer?.email || user.email,
+      email: payerEmail,
+      first_name: firstName,
+      last_name: lastName,
+      identification: formData.payer?.identification,
+    },
+    additional_info: {
+      items: [
+        {
+          id: "premium-access",
+          title: "Survival Chilean Spanish — Full Access",
+          description: "Unlock all modules and every lesson. Lifetime access.",
+          category_id: "services",
+          quantity: 1,
+          unit_price: amountCLP,
+        },
+      ],
+      payer: {
+        first_name: firstName,
+        last_name: lastName,
+      },
     },
   };
 
@@ -173,8 +221,8 @@ async function handleProcessPayment(req: Request) {
     mp_payment_id: String(payment.id),
     mp_preference_id: String(payment.order?.id ?? ""),
     status,
-    amount: payment.transaction_amount ?? 19,
-    currency: payment.currency_id ?? "USD",
+    amount: amountCLP,
+    currency: "CLP",
   });
 
   if (status === "approved") {
