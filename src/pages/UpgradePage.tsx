@@ -81,7 +81,8 @@ export default function UpgradePage() {
       } else if (data.status === 'pending' || data.status === 'in_process') {
         navigate('/payment/pending');
       } else {
-        setCheckoutError('Payment was not approved. Please check your card details and try again.');
+        const detail = data.status_detail ? ` (${data.status_detail})` : '';
+        setCheckoutError(`Payment was not approved${detail}. Please check your card details and try again.`);
         setIsProcessing(false);
       }
     } catch {

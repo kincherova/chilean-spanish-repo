@@ -179,7 +179,7 @@ async function handleProcessPayment(req: Request) {
   }
 
   return new Response(
-    JSON.stringify({ status, payment_id: payment.id, is_premium: status === "approved" }),
+    JSON.stringify({ status, status_detail: payment.status_detail, payment_id: payment.id, is_premium: status === "approved" }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } }
   );
 }
