@@ -226,7 +226,7 @@ async function handleProcessPayment(req: Request) {
   });
 
   if (status === "approved") {
-    await admin.from("user_profiles").update({ is_premium: true }).eq("id", user.id);
+    await admin.from("user_profiles").update({ is_premium: true, access_type: "paid" }).eq("id", user.id);
   }
 
   return new Response(
@@ -518,6 +518,7 @@ Deno.serve(async (req: Request) => {
           name: userName,
           email: user.email ?? "",
           is_premium: true,
+          access_type: "access_code",
           onboarding_completed: false,
         }, { onConflict: "id" });
 
