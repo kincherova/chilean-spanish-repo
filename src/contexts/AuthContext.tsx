@@ -32,9 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select('is_premium')
       .eq('id', userId)
       .maybeSingle();
-    if (gen !== premiumFetchGen.current) return data?.is_premium ?? false;
     const premium = data?.is_premium ?? false;
-    setIsPremium(premium);
+    // Only apply if no newer fetch has started
+    if (gen === premiumFetchGen.current) {
+      setIsPremium(premium);
+    }
     return premium;
   }
 
@@ -48,20 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    // onAuthStateChange fires INITIAL_SESSION synchronously covering the getSession case,
+    // so we only use getSession to handle the no-session (logged-out) fast path.
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         setSession(null);
         setUser(null);
         setIsPremium(false);
         resolve();
-      } else {
-        setSession(session);
-        setUser(session.user);
-        (async () => {
-          await fetchPremiumStatus(session.user.id);
-          resolve();
-        })();
       }
+      // If session exists, onAuthStateChange INITIAL_SESSION will handle it.
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
