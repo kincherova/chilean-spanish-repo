@@ -34,7 +34,7 @@ export default function UpgradePage() {
     }
   }, [step]);
 
-  const handleCardSubmit = async (token: string, paymentMethodId: string, issuerId: string, installments: number) => {
+  const handleCardSubmit = async (token: string, paymentMethodId: string, issuerId: string, installments: number, identificationNumber: string) => {
     setIsProcessing(true);
     setCheckoutError(null);
     try {
@@ -61,7 +61,7 @@ export default function UpgradePage() {
             transaction_amount: 19,
             payer: {
               email: user?.email || '',
-              identification: { type: 'Otro', number: '0' },
+              identification: { type: 'Otro', number: identificationNumber },
             },
           }),
         }

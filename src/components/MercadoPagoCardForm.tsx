@@ -23,18 +23,29 @@ interface MPField {
 }
 
 interface Props {
-  onSubmit: (token: string, paymentMethodId: string, issuerId: string, installments: number) => Promise<void>;
+  onSubmit: (token: string, paymentMethodId: string, issuerId: string, installments: number, identificationNumber: string) => Promise<void>;
   onError: (msg: string) => void;
   isProcessing: boolean;
 }
 
+const ID_TYPES = [
+  { value: 'Otro', label: 'Passport / Other' },
+  { value: 'RUT', label: 'RUT (Chile)' },
+  { value: 'DNI', label: 'DNI (Argentina)' },
+  { value: 'CC', label: 'CC (Colombia)' },
+  { value: 'CPF', label: 'CPF (Brazil)' },
+];
+
 export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }: Props) {
   const [ready, setReady] = useState(false);
   const [cardholderName, setCardholderName] = useState('');
+  const [identificationType, setIdentificationType] = useState('Otro');
+  const [identificationNumber, setIdentificationNumber] = useState('');
   const [cardNumberError, setCardNumberError] = useState('');
   const [expirationError, setExpirationError] = useState('');
   const [securityCodeError, setSecurityCodeError] = useState('');
   const [nameError, setNameError] = useState('');
+  const [idError, setIdError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const mpRef = useRef<MPInstance | null>(null);
@@ -110,11 +121,24 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let valid = true;
+
     if (!cardholderName.trim()) {
       setNameError('Please enter the name as it appears on your card');
-      return;
+      valid = false;
+    } else {
+      setNameError('');
     }
-    setNameError('');
+
+    if (!identificationNumber.trim()) {
+      setIdError('Please enter your ID number');
+      valid = false;
+    } else {
+      setIdError('');
+    }
+
+    if (!valid) return;
+
     setSubmitting(true);
     try {
       const mp = mpRef.current;
@@ -122,8 +146,8 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
 
       const token = await mp.fields.createCardToken({
         cardholderName: cardholderName.trim(),
-        identificationType: 'Otro',
-        identificationNumber: '0',
+        identificationType,
+        identificationNumber: identificationNumber.trim(),
       });
 
       await onSubmit(
@@ -131,6 +155,7 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
         paymentMethodIdRef.current,
         issuerIdRef.current,
         1,
+        identificationNumber.trim(),
       );
     } catch (err) {
       const e = err as { message?: string };
@@ -187,6 +212,32 @@ export default function MercadoPagoCardForm({ onSubmit, onError, isProcessing }:
           disabled={busy}
         />
         {nameError && <p className="mt-1 text-xs text-red-500">{nameError}</p>}
+      </div>
+
+      <div>
+        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">ID type &amp; number</label>
+        <div className="flex gap-2">
+          <select
+            value={identificationType}
+            onChange={(e) => setIdentificationType(e.target.value)}
+            disabled={busy}
+            className="border border-gray-200 rounded-xl px-3 py-3 text-sm text-navy bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-colors flex-shrink-0"
+          >
+            {ID_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={identificationNumber}
+            onChange={(e) => { setIdentificationNumber(e.target.value); setIdError(''); }}
+            placeholder="Passport or ID number"
+            className="flex-1 border border-gray-200 rounded-xl px-3 py-3 text-sm text-navy placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-colors"
+            autoComplete="off"
+            disabled={busy}
+          />
+        </div>
+        {idError && <p className="mt-1 text-xs text-red-500">{idError}</p>}
       </div>
 
       {!ready && (
