@@ -81,7 +81,8 @@ export default function UpgradePage() {
       } else if (data.status === 'pending' || data.status === 'in_process') {
         navigate('/payment/pending');
       } else {
-        const detail = data.status_detail ? ` (${data.status_detail})` : '';
+        const parts = [data.status_detail, data.mp_error, data.mp_cause ? JSON.stringify(data.mp_cause) : null].filter(Boolean);
+        const detail = parts.length > 0 ? ` (${parts.join(' | ')})` : '';
         setCheckoutError(`Payment was not approved${detail}. Please check your card details and try again.`);
         setIsProcessing(false);
       }

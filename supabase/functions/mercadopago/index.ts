@@ -163,7 +163,10 @@ async function handleProcessPayment(req: Request) {
 
   const payment = await mpRes.json();
   const status = payment.status;
+  const statusDetail = payment.status_detail ?? null;
   const admin = supabaseAdmin();
+
+  console.log("MP payment response:", JSON.stringify({ id: payment.id, status, status_detail: statusDetail, error: payment.error, cause: payment.cause }));
 
   await admin.from("payments").insert({
     user_id: user.id,
@@ -179,7 +182,7 @@ async function handleProcessPayment(req: Request) {
   }
 
   return new Response(
-    JSON.stringify({ status, status_detail: payment.status_detail, payment_id: payment.id, is_premium: status === "approved" }),
+    JSON.stringify({ status, status_detail: statusDetail, mp_error: payment.error, mp_cause: payment.cause, payment_id: payment.id, is_premium: status === "approved" }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } }
   );
 }
