@@ -48,13 +48,13 @@ export default function AdminUsersPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { navigate('/login'); return; }
 
-      const { data, error: err } = await supabase
-        .from('user_profiles')
-        .select('id, name, email, is_premium, access_type, created_at')
-        .order('created_at', { ascending: false });
-
-      if (err) throw err;
-      setUsers(data ?? []);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`,
+        { headers: { Authorization: `Bearer ${session.access_token}` } }
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Failed to load users');
+      setUsers(json.users ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load users');
     } finally {
@@ -260,3 +260,6 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
+
+export default AdminUsersPage
