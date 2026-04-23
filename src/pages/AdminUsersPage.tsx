@@ -260,6 +260,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-
-
-export default AdminUsersPage
