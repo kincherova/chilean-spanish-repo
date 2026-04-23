@@ -53,7 +53,7 @@ export default function AdminUsersPage() {
         { headers: { Authorization: `Bearer ${session.access_token}` } }
       );
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? 'Failed to load users');
+      if (!res.ok) throw new Error(`${res.status}: ${json.error ?? JSON.stringify(json)}`);
       setUsers(json.users ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load users');

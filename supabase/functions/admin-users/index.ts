@@ -34,11 +34,11 @@ Deno.serve(async (req: Request) => {
 
     const token = authHeader.slice(7);
     const payload = parseJwtPayload(token);
-    const email = payload?.email as string | undefined;
+    const userId = payload?.sub as string | undefined;
 
-    if (!email || email !== ADMIN_EMAIL) {
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -46,6 +46,20 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Look up the user's email via auth.admin API
+    const { data: { user }, error: userErr } = await admin.auth.admin.getUserById(userId);
+    if (userErr || !user) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (user.email !== ADMIN_EMAIL) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { data, error } = await admin
       .from("user_profiles")
