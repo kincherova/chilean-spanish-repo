@@ -1,10 +1,12 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from ?? '/modules';
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,7 +24,7 @@ export default function LoginPage() {
       if (error) {
         setError('Invalid email or password');
       } else {
-        navigate('/modules');
+        navigate(from);
       }
     } else {
       if (!name.trim()) {
@@ -34,7 +36,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       } else {
-        navigate('/modules');
+        navigate(from);
       }
     }
     setLoading(false);
