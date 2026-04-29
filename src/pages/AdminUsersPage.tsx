@@ -50,12 +50,7 @@ export default function AdminUsersPage() {
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            'x-user-token': session.access_token,
-          },
-        }
+        { headers: { Authorization: `Bearer ${session.access_token}` } }
       );
       const json = await res.json();
       if (!res.ok) throw new Error(`${res.status}: ${json.error ?? JSON.stringify(json)}`);
